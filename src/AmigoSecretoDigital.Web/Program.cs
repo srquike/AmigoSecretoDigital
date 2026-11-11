@@ -142,6 +142,7 @@ app.UseAntiforgery();
 if (hasSupabaseUrl && hasSupabaseKey)
     app.MapOrganizerAuthentication();
 
+app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
