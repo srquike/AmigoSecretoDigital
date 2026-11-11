@@ -162,8 +162,9 @@ else
                     _invitation = await Exchanges.GetCurrentInvitationAsync(_exchange.Id);
             }
         }
-        catch
+        catch (Exception exception)
         {
+            Logger.LogError(exception, "Failed to load exchange details for {ExchangeId}.", _exchangeGuid);
             _isError = true;
             _message = "No pudimos cargar este intercambio. Intenta recargar la página.";
         }

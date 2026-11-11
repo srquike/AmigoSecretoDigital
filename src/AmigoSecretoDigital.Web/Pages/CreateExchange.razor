@@ -2,6 +2,7 @@
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @inject IExchangeService Exchanges
 @inject NavigationManager Navigation
+@inject ILogger<CreateExchange> Logger
 
 <PageTitle>Crear intercambio · Amigo Secreto</PageTitle>
 <a class="back-link" href="/">← Volver al inicio</a>
@@ -57,8 +58,9 @@
             exchange = await Exchanges.CreateAsync(new CreateExchangeRequest(
                 _name, _eventDate, _conditions, _budget, _expectedParticipants));
         }
-        catch
+        catch (Exception exception)
         {
+            Logger.LogError(exception, "Exchange creation failed.");
             _errors.Add("No pudimos crear el intercambio. Revisa los datos e intenta de nuevo.");
             _isSaving = false;
             return;
@@ -68,8 +70,9 @@
         {
             await Exchanges.CreateInvitationAsync(exchange.Id);
         }
-        catch
+        catch (Exception exception)
         {
+            Logger.LogError(exception, "Invitation link creation failed for exchange {ExchangeId}.", exchange.Id);
             // The exchange is already persisted; its detail page lets the organizer retry link generation.
         }
 
