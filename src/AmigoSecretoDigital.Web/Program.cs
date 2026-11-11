@@ -70,6 +70,13 @@ if (!hasSupabaseUrl && !builder.Environment.IsDevelopment())
 
 if (hasSupabaseUrl && hasSupabaseKey)
 {
+    var invitationEncryptionKey = builder.Configuration["InvitationTokens:EncryptionKey"];
+    if (string.IsNullOrWhiteSpace(invitationEncryptionKey))
+    {
+        throw new InvalidOperationException(
+            "Configure InvitationTokens:EncryptionKey as a base64-encoded 32-byte key.");
+    }
+
     if (!Uri.TryCreate(supabaseUrl, UriKind.Absolute, out var supabaseUri) ||
         (supabaseUri.Scheme != Uri.UriSchemeHttps && supabaseUri.Scheme != Uri.UriSchemeHttp))
     {
@@ -80,6 +87,7 @@ if (hasSupabaseUrl && hasSupabaseKey)
         supabaseUrl!,
         supabasePublishableKey!,
         configureOptions: options => options.AutoRefreshToken = true);
+    builder.Services.AddSingleton(new InvitationTokenProtector(invitationEncryptionKey));
     builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
         {
@@ -111,8 +119,6 @@ else
         .AddCookie();
     builder.Services.AddScoped<IExchangeService, DemoExchangeService>();
 }
-
-builder.Services.AddSingleton<ExchangeInvitationCache>();
 
 var app = builder.Build();
 

@@ -1,7 +1,6 @@
 @page "/admin/exchange/{ExchangeId}"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @inject IExchangeService Exchanges
-@inject ExchangeInvitationCache InvitationCache
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 @inject ILogger<Exchange> Logger
@@ -159,8 +158,8 @@ else
                 _participants = await Exchanges.GetParticipantsAsync(_exchangeGuid);
                 if (_exchange.Status == ExchangeStatus.Drawn)
                     _assignments = await Exchanges.GetAssignmentsAsync(_exchangeGuid);
-                if (InvitationCache.TryGet(_exchange.OrganizerId, _exchange.Id, out var invitation))
-                    _invitation = invitation;
+                else if (_exchange.Status == ExchangeStatus.RegistrationOpen)
+                    _invitation = await Exchanges.GetCurrentInvitationAsync(_exchange.Id);
             }
         }
         catch
@@ -176,7 +175,6 @@ else
         await RunBusyAsync(async () =>
         {
             _invitation = await Exchanges.CreateInvitationAsync(_exchangeGuid);
-            InvitationCache.Set(_exchange!.OrganizerId, _exchange.Id, _invitation);
             _message = "Enlace listo para compartir con toda la familia.";
         });
     }

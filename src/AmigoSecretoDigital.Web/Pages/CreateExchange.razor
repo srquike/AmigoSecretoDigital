@@ -1,7 +1,6 @@
 @page "/admin/create"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @inject IExchangeService Exchanges
-@inject ExchangeInvitationCache InvitationCache
 @inject NavigationManager Navigation
 
 <PageTitle>Crear intercambio · Amigo Secreto</PageTitle>
@@ -67,8 +66,7 @@
 
         try
         {
-            var invitation = await Exchanges.CreateInvitationAsync(exchange.Id);
-            InvitationCache.Set(exchange.OrganizerId, exchange.Id, invitation);
+            await Exchanges.CreateInvitationAsync(exchange.Id);
         }
         catch
         {

@@ -10,6 +10,7 @@ namespace AmigoSecretoDigital.Web.Services;
 
 public sealed class SupabaseExchangeService(
     AuthenticatedSupabaseClient authenticatedClient,
+    InvitationTokenProtector invitationTokenProtector,
     ILogger<SupabaseExchangeService> logger) : IExchangeService
 {
     public async Task<Exchange> CreateAsync(CreateExchangeRequest request, CancellationToken cancellationToken = default)
@@ -64,11 +65,29 @@ public sealed class SupabaseExchangeService(
         await client.Rpc("rotate_invitation_token", new
         {
             p_exchange_id = exchangeId,
-            p_token_hash = HashToken(token)
+            p_token_hash = HashToken(token),
+            p_token_ciphertext = invitationTokenProtector.Protect(exchangeId, token)
         });
 
         logger.LogInformation("Shared invitation link rotated for exchange {ExchangeId}.", exchangeId);
         return new Invitation($"/join/{token}", DateTimeOffset.UtcNow.AddDays(90));
+    }
+
+    public async Task<Invitation?> GetCurrentInvitationAsync(
+        Guid exchangeId,
+        CancellationToken cancellationToken = default)
+    {
+        var client = await authenticatedClient.GetAsync(cancellationToken);
+        var row = await QuerySingleOrDefaultAsync<AdminInvitationTokenRow>(
+            client,
+            "get_admin_invitation_token",
+            new { p_exchange_id = exchangeId });
+
+        if (row is null)
+            return null;
+
+        var token = invitationTokenProtector.Unprotect(exchangeId, row.TokenCiphertext);
+        return new Invitation($"/join/{token}", row.ExpiresAt);
     }
 
     public async Task<InvitationContext?> GetInvitationContextAsync(

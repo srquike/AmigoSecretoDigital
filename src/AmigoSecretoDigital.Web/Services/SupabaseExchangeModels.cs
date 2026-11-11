@@ -60,6 +60,15 @@ public sealed class InvitationContextRow
     public int ParticipantCount { get; set; }
 }
 
+public sealed class AdminInvitationTokenRow
+{
+    [JsonPropertyName("invitation_token_ciphertext")]
+    public string TokenCiphertext { get; set; } = string.Empty;
+
+    [JsonPropertyName("invitation_expires_at")]
+    public DateTimeOffset ExpiresAt { get; set; }
+}
+
 public sealed class ParticipantRow
 {
     [JsonPropertyName("participant_id")]

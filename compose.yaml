@@ -11,6 +11,7 @@ services:
       ASPNETCORE_HTTP_PORTS: "8080"
       Supabase__Url: ${SUPABASE_URL:?Define SUPABASE_URL en el archivo .env}
       Supabase__PublishableKey: ${SUPABASE_PUBLISHABLE_KEY:?Define SUPABASE_PUBLISHABLE_KEY en el archivo .env}
+      InvitationTokens__EncryptionKey: ${INVITATION_TOKEN_ENCRYPTION_KEY:?Define INVITATION_TOKEN_ENCRYPTION_KEY en el archivo .env}
     ports:
       - "127.0.0.1:8080:8080"
     volumes:

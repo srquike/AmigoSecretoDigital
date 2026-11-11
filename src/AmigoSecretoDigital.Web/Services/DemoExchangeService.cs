@@ -48,6 +48,22 @@ public sealed class DemoExchangeService(DemoFamilyService family) : IExchangeSer
         return Task.FromResult(new Invitation(family.ExchangeInvitePath, DateTimeOffset.UtcNow.AddDays(90)));
     }
 
+    public Task<Invitation?> GetCurrentInvitationAsync(Guid exchangeId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        try
+        {
+            SelectExchangeOrThrow(exchangeId);
+            return Task.FromResult<Invitation?>(new Invitation(
+                family.ExchangeInvitePath,
+                DateTimeOffset.UtcNow.AddDays(90)));
+        }
+        catch (KeyNotFoundException)
+        {
+            return Task.FromResult<Invitation?>(null);
+        }
+    }
+
     public Task<InvitationContext?> GetInvitationContextAsync(string invitationToken, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

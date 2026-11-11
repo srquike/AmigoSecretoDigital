@@ -25,7 +25,8 @@ Los componentes interactivos y los servicios de confianza se ejecutan en ASP.NET
 - Los componentes del servidor mantienen las credenciales privadas fuera del navegador. Nunca incluir claves secretas de Supabase, contraseñas administrativas ni secretos de firma en componentes del cliente o archivos estáticos.
 - La administración requiere una cuenta de Supabase Auth con correo y contraseña; no existe registro público. Las rutas `/admin` están protegidas con autenticación por cookie `HttpOnly`, `Secure` y `SameSite=Lax`, y los intentos de inicio de sesión tienen límite por IP.
 - La cookie del navegador contiene un identificador opaco; los tokens de acceso y renovación de Supabase se guardan solo en memoria del proceso del servidor. Si el proceso se reinicia, los organizadores vuelven a iniciar sesión. Este diseño requiere una sola instancia de la aplicación; para varias instancias se debe usar un almacén de sesión distribuido.
-- El enlace compartido de invitación usa un token aleatorio de alta entropía, se almacena como SHA-256 y vence a los 90 días. Renovarlo invalida el enlace previo.
+- El enlace compartido de invitación usa un token aleatorio de alta entropía; Supabase guarda su SHA-256 para validarlo y una copia cifrada con AES-GCM para que el organizador pueda recuperar el mismo enlace después de reiniciar la aplicación. Vence a los 90 días y renovarlo invalida el enlace previo.
+- La clave AES de los enlaces se configura como `InvitationTokens:EncryptionKey`, nunca se guarda en Supabase ni en el repositorio y debe mantenerse estable entre reinicios y despliegues. Si se pierde, el enlace existente no podrá descifrarse y habrá que generar uno nuevo.
 - Los enlaces de revelación son individuales, sus tokens se almacenan como hash y vencen a los 90 días. Renovar uno revoca el anterior; por sí solo no revela el resultado.
 - La frase privada se transforma a bcrypt con pgcrypto antes de guardarse. La función de revelación aplica 8 intentos fallidos y un bloqueo temporal; nunca devuelve hashes a la aplicación.
 - Las frases privadas nuevas deben tener entre 5 y 10 caracteres. La pantalla de revelación sigue aceptando frases anteriores de más de 10 caracteres para no bloquear participantes ya registrados.
@@ -58,15 +59,20 @@ Aplica después `supabase/migrations/202611090003_fix_reveal_link_row.sql` para 
 
 Aplica `supabase/migrations/202611090004_access_phrase_5_to_10.sql` para validar el nuevo rango al registrar participantes.
 
+Aplica `supabase/migrations/202611100001_persist_invitation_token.sql` para conservar de forma cifrada el enlace de invitación y recuperarlo al volver a abrir el intercambio. Los enlaces creados antes de aplicar esta migración no se pueden recuperar porque solo se guardó su hash; genera uno nuevo después de actualizar.
+
 Configura las credenciales del proyecto para desarrollo con Secret Manager (desde la raíz del repositorio). Crea la cuenta del organizador desde Supabase Auth; esta aplicación no ofrece registro de cuentas:
 
 ```powershell
 dotnet user-secrets init --project src/AmigoSecretoDigital.Web
 dotnet user-secrets set "Supabase:Url" "https://TU-PROYECTO.supabase.co" --project src/AmigoSecretoDigital.Web
 dotnet user-secrets set "Supabase:PublishableKey" "sb_publishable_..." --project src/AmigoSecretoDigital.Web
+$key = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+dotnet user-secrets set "InvitationTokens:EncryptionKey" $key --project src/AmigoSecretoDigital.Web
+$key = $null
 ```
 
-En producción, configura las variables `Supabase__Url` y `Supabase__PublishableKey` en el entorno del servidor. Se usa la clave publicable (o `anon` legacy); nunca configures `service_role` ni una clave `sb_secret_...` en esta aplicación. En `Development`, si ambas opciones están ausentes, el sitio usa datos temporales de demostración; si solo una está configurada, el inicio falla explícitamente. Fuera de `Development`, Supabase es obligatorio.
+En producción, configura `Supabase__Url`, `Supabase__PublishableKey` e `InvitationTokens__EncryptionKey` en el entorno del servidor (en Railway, en **Variables**). La clave de cifrado debe ser la misma para cada despliegue que comparte la misma base de datos. Se usa la clave publicable (o `anon` legacy); nunca configures `service_role` ni una clave `sb_secret_...` en esta aplicación. En `Development`, si Supabase no está configurado, el sitio usa datos temporales de demostración; si Supabase está configurado, también se requiere la clave de cifrado. Fuera de `Development`, Supabase es obligatorio.
 
 ## Ejecutar con Docker
 

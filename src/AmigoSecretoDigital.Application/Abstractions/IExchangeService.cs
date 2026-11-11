@@ -12,6 +12,8 @@ public interface IExchangeService
 
     Task<Invitation> CreateInvitationAsync(Guid exchangeId, CancellationToken cancellationToken = default);
 
+    Task<Invitation?> GetCurrentInvitationAsync(Guid exchangeId, CancellationToken cancellationToken = default);
+
     Task<InvitationContext?> GetInvitationContextAsync(string invitationToken, CancellationToken cancellationToken = default);
 
     Task<ParticipantProfile> JoinAsync(JoinExchangeRequest request, CancellationToken cancellationToken = default);
