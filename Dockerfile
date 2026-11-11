@@ -6,6 +6,10 @@ WORKDIR /source
 COPY ["src/AmigoSecretoDigital.Web/AmigoSecretoDigital.Web.csproj", "src/AmigoSecretoDigital.Web/"]
 COPY ["src/AmigoSecretoDigital.Application/AmigoSecretoDigital.Application.csproj", "src/AmigoSecretoDigital.Application/"]
 COPY ["src/AmigoSecretoDigital.Core/AmigoSecretoDigital.Core.csproj", "src/AmigoSecretoDigital.Core/"]
+# .NET 10 conditionally includes the Blazor framework asset package when Razor
+# components exist during restore. Copy one component before restore so the
+# published image contains /_framework/blazor.web.js.
+COPY ["src/AmigoSecretoDigital.Web/Components/App.razor", "src/AmigoSecretoDigital.Web/Components/App.razor"]
 RUN dotnet restore "src/AmigoSecretoDigital.Web/AmigoSecretoDigital.Web.csproj"
 
 COPY . .
