@@ -219,6 +219,15 @@ public sealed class DemoFamilyService
         return id;
     }
 
+    public bool DeleteActiveExchange()
+    {
+        if (!_exchanges.Remove(ActiveExchangeId))
+            return false;
+
+        ActiveExchangeId = _exchanges.Values.FirstOrDefault()?.Id ?? string.Empty;
+        return true;
+    }
+
     private static DemoExchangeState CreateState(string id, string name, DateOnly eventDate, decimal budget, int expectedParticipants, string conditions, string inviteCode) =>
         new(id, name, eventDate, budget, expectedParticipants, conditions, inviteCode);
 

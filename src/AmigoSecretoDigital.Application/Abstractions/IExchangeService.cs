@@ -10,6 +10,8 @@ public interface IExchangeService
 
     Task<Exchange?> GetExchangeAsync(Guid exchangeId, CancellationToken cancellationToken = default);
 
+    Task DeleteAsync(Guid exchangeId, CancellationToken cancellationToken = default);
+
     Task<Invitation> CreateInvitationAsync(Guid exchangeId, CancellationToken cancellationToken = default);
 
     Task<Invitation?> GetCurrentInvitationAsync(Guid exchangeId, CancellationToken cancellationToken = default);

@@ -1,6 +1,7 @@
 @page "/admin/exchanges"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @inject IExchangeService Exchanges
+@inject ILogger<ExchangeList> Logger
 
 <PageTitle>Intercambios · Amigo Secreto</PageTitle>
 <div class="eyebrow">ADMINISTRACIÓN FAMILIAR</div>
@@ -34,7 +35,12 @@ else
                 <h2>@exchange.Name</h2>
                 <div class="list-card-date">📅 <span>@exchange.EventDate.ToString("dd 'de' MMMM 'de' yyyy", SpanishCulture)</span></div>
                 <div class="list-card-meta"><span><b>Registrados / previstos</b><strong>@item.ParticipantCount / @exchange.ExpectedParticipants</strong></span><span><b>Presupuesto</b><strong>@(exchange.Budget is null ? "Sin límite" : $"${exchange.Budget:0.##}")</strong></span></div>
-                <div class="list-card-bottom"><span class="current-tag current-tag-empty">&nbsp;</span><a class="btn btn-light" href="@($"/admin/exchange/{exchange.Id}")">Ver detalle <span>→</span></a></div>
+                <div class="list-card-bottom">
+                    <a class="btn btn-light" href="@($"/admin/exchange/{exchange.Id}")">Ver detalle <span>→</span></a>
+                    <ConfirmDeleteExchange ExchangeName="@exchange.Name"
+                                           IsBusy="@(_deletingExchangeId == exchange.Id)"
+                                           OnConfirm="@(() => DeleteExchangeAsync(exchange.Id))" />
+                </div>
             </article>
         }
     </section>
@@ -45,12 +51,36 @@ else
     private IReadOnlyList<ExchangeSummary> _exchanges = [];
     private bool _isLoading = true;
     private string? _error;
+    private Guid? _deletingExchangeId;
 
     protected override async Task OnInitializedAsync()
     {
         try { _exchanges = await Exchanges.GetExchangesAsync(); }
         catch { _error = "No pudimos cargar los intercambios. Intenta recargar la página."; }
         finally { _isLoading = false; }
+    }
+
+    private async Task DeleteExchangeAsync(Guid exchangeId)
+    {
+        if (_deletingExchangeId.HasValue)
+            return;
+
+        _deletingExchangeId = exchangeId;
+        _error = null;
+        try
+        {
+            await Exchanges.DeleteAsync(exchangeId);
+            _exchanges = await Exchanges.GetExchangesAsync();
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to delete exchange {ExchangeId}.", exchangeId);
+            _error = "No pudimos eliminar el intercambio. Intenta de nuevo.";
+        }
+        finally
+        {
+            _deletingExchangeId = null;
+        }
     }
 
     private static string StatusLabel(ExchangeStatus status) => status switch

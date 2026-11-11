@@ -1,0 +1,10 @@
+.delete-exchange-trigger { min-height:35px; padding:0 11px; font-size:10px; }
+.delete-exchange-backdrop { position:fixed; inset:0; z-index:1200; display:grid; place-items:center; padding:20px; background:rgba(24,35,27,.48); }
+.delete-exchange-dialog { width:min(100%,440px); padding:26px; border:1px solid #eee9df; border-radius:18px; background:#fffefa; box-shadow:0 24px 80px rgba(20,38,26,.25); }
+.delete-exchange-icon { display:grid; place-items:center; width:42px; height:42px; margin-bottom:14px; border-radius:13px; color:#a44738; background:#fae9e5; font-size:21px; font-weight:850; }
+.delete-exchange-dialog .eyebrow { color:#a44738; }
+.delete-exchange-dialog h2 { margin:7px 0 10px; color:#2b3f31; font-size:19px; font-weight:850; letter-spacing:-.45px; }
+.delete-exchange-dialog p { margin:0; color:#737d73; font-size:12px; line-height:1.6; }
+.delete-exchange-actions { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:9px; margin-top:22px; }
+.delete-exchange-actions .btn { min-height:39px; padding:0 13px; font-size:10px; }
+@media(max-width:480px) { .delete-exchange-dialog { padding:21px; } .delete-exchange-actions { flex-direction:column-reverse; } .delete-exchange-actions .btn { width:100%; } }

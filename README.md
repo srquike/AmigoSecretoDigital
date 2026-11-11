@@ -19,6 +19,7 @@ Los componentes interactivos y los servicios de confianza se ejecutan en ASP.NET
 4. Una función confiable del lado de Supabase valida las restricciones y realiza el sorteo.
 5. Administración muestra la lista de participantes con su amigo asignado y permite generar un enlace de revelación individual para cada participante.
 6. La vista de revelación está separada de administración. El invitado abre su enlace personal e ingresa su frase privada para consultar su resultado. El catálogo de frases contiene 50 frases estáticas e independientes de los datos personales.
+7. El organizador puede eliminar un intercambio en cualquier estado. La confirmación elimina permanentemente también a sus participantes, asignaciones y enlaces asociados.
 
 ## Seguridad
 
@@ -60,6 +61,8 @@ Aplica después `supabase/migrations/202611090003_fix_reveal_link_row.sql` para 
 Aplica `supabase/migrations/202611090004_access_phrase_5_to_10.sql` para validar el nuevo rango al registrar participantes.
 
 Aplica `supabase/migrations/202611100001_persist_invitation_token.sql` para conservar de forma cifrada el enlace de invitación y recuperarlo al volver a abrir el intercambio. Los enlaces creados antes de aplicar esta migración no se pueden recuperar porque solo se guardó su hash; genera uno nuevo después de actualizar.
+
+Aplica `supabase/migrations/202611100002_delete_exchange.sql` para habilitar la eliminación permanente de intercambios por su organizador, independientemente del estado.
 
 Configura las credenciales del proyecto para desarrollo con Secret Manager (desde la raíz del repositorio). Crea la cuenta del organizador desde Supabase Auth; esta aplicación no ofrece registro de cuentas:
 

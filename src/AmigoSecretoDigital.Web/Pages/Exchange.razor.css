@@ -1,6 +1,6 @@
 .page-title-row { display:flex; align-items:flex-start; justify-content:space-between; gap:15px; }
 .page-title-row .page-subtitle { margin-bottom:22px; }
-.page-title-row>.status { margin-top:5px; }
+.exchange-page-actions { display:flex; align-items:center; gap:9px; margin-top:4px; }
 .exchange-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(250px,.9fr); align-items:start; gap:15px; }
 .exchange-main,.exchange-aside { display:grid; gap:15px; }
 .event-card { padding:20px 22px; }
@@ -64,4 +64,4 @@
 .demo-notice { padding:11px 13px; border:1px dashed #e8dcbf; border-radius:9px; color:#8c7958; background:#fffaf0; font-size:9px; line-height:1.6; }
 .demo-notice b { color:#79613b; }
 @media(max-width:1200px) { .exchange-layout { grid-template-columns:1fr; } .exchange-aside { grid-template-columns:1fr 1fr; align-items:start; } .demo-notice { grid-column:1/-1; } }
-@media(max-width:600px) { .page-title-row { display:block; } .page-title-row>.status { display:inline-flex; margin:0 0 14px; } .exchange-aside { grid-template-columns:1fr; } .event-details { grid-template-columns:1fr 1fr; } .event-details span:last-child { grid-column:1/-1; } .participants-heading,.participant-row,.assignment-row,.participants-footer { padding-right:13px; padding-left:13px; } .participants-heading { align-items:flex-start; } .participants-footer { align-items:flex-start; flex-direction:column; } .person-status { font-size:0; } .person-status i { width:7px; height:7px; } .assignment-row { gap:7px; } .reveal-generate { padding:0 7px; font-size:8px; } }
+@media(max-width:600px) { .page-title-row { display:block; } .exchange-page-actions { margin:0 0 14px; } .exchange-aside { grid-template-columns:1fr; } .event-details { grid-template-columns:1fr 1fr; } .event-details span:last-child { grid-column:1/-1; } .participants-heading,.participant-row,.assignment-row,.participants-footer { padding-right:13px; padding-left:13px; } .participants-heading { align-items:flex-start; } .participants-footer { align-items:flex-start; flex-direction:column; } .person-status { font-size:0; } .person-status i { width:7px; height:7px; } .assignment-row { gap:7px; } .reveal-generate { padding:0 7px; font-size:8px; } }

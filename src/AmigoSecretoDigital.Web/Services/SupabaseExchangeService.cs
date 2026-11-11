@@ -58,6 +58,13 @@ public sealed class SupabaseExchangeService(
         return row is null ? null : MapExchange(row);
     }
 
+    public async Task DeleteAsync(Guid exchangeId, CancellationToken cancellationToken = default)
+    {
+        var client = await authenticatedClient.GetAsync(cancellationToken);
+        await client.Rpc("delete_exchange", new { p_exchange_id = exchangeId });
+        logger.LogInformation("Exchange {ExchangeId} and its related records deleted.", exchangeId);
+    }
+
     public async Task<Invitation> CreateInvitationAsync(Guid exchangeId, CancellationToken cancellationToken = default)
     {
         var token = CreateToken();

@@ -41,6 +41,16 @@ public sealed class DemoExchangeService(DemoFamilyService family) : IExchangeSer
         return Task.FromResult<Exchange?>(MapActiveExchange(card.Id));
     }
 
+    public Task DeleteAsync(Guid exchangeId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        SelectExchangeOrThrow(exchangeId);
+        if (!family.DeleteActiveExchange())
+            throw new KeyNotFoundException("Exchange not found.");
+
+        return Task.CompletedTask;
+    }
+
     public Task<Invitation> CreateInvitationAsync(Guid exchangeId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

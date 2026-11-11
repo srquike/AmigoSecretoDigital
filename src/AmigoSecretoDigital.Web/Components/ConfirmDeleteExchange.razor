@@ -1,0 +1,43 @@
+<button class="btn btn-danger delete-exchange-trigger" type="button" disabled="@IsBusy" @onclick="Open">
+    Eliminar
+</button>
+
+@if (_isOpen)
+{
+    <div class="delete-exchange-backdrop" @onclick="Close">
+        <section class="delete-exchange-dialog" role="alertdialog" aria-modal="true"
+                 aria-labelledby="delete-exchange-title" aria-describedby="delete-exchange-description"
+                 @onclick:stopPropagation>
+            <span class="delete-exchange-icon" aria-hidden="true">!</span>
+            <div class="eyebrow">ACCIÓN PERMANENTE</div>
+            <h2 id="delete-exchange-title">¿Eliminar «@ExchangeName»?</h2>
+            <p id="delete-exchange-description">
+                Se eliminarán el intercambio, sus participantes, el resultado del sorteo y sus enlaces. Esta acción no se puede deshacer.
+            </p>
+            <div class="delete-exchange-actions">
+                <button class="btn btn-light" type="button" disabled="@IsBusy" @onclick="Close">Conservar intercambio</button>
+                <button class="btn btn-danger" type="button" disabled="@IsBusy" @onclick="ConfirmAsync">
+                    @(IsBusy ? "Eliminando…" : "Sí, eliminar intercambio")
+                </button>
+            </div>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public string ExchangeName { get; set; } = string.Empty;
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+
+    private bool _isOpen;
+
+    private void Open() => _isOpen = true;
+
+    private void Close()
+    {
+        if (!IsBusy)
+            _isOpen = false;
+    }
+
+    private Task ConfirmAsync() => IsBusy ? Task.CompletedTask : OnConfirm.InvokeAsync();
+}

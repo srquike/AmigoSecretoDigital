@@ -18,7 +18,13 @@ else
 {
     var hasMinimumParticipants = _participants.Count >= ExchangeRules.MinimumParticipants;
     <div class="eyebrow">ADMINISTRACIÓN FAMILIAR</div>
-    <div class="page-title-row"><div><h1 class="page-heading">@_exchange.Name</h1><p class="page-subtitle">Invita a los tuyos y prepara el sorteo de diciembre.</p></div><span class="status @StatusClass(_exchange.Status)">@StatusLabel(_exchange.Status)</span></div>
+    <div class="page-title-row">
+        <div><h1 class="page-heading">@_exchange.Name</h1><p class="page-subtitle">Invita a los tuyos y prepara el sorteo de diciembre.</p></div>
+        <div class="exchange-page-actions">
+            <span class="status @StatusClass(_exchange.Status)">@StatusLabel(_exchange.Status)</span>
+            <ConfirmDeleteExchange ExchangeName="@_exchange.Name" IsBusy="@_isDeletingExchange" OnConfirm="DeleteExchangeAsync" />
+        </div>
+    </div>
 
     @if (!string.IsNullOrWhiteSpace(_message)) { <div class="alert @(_isError ? "alert-error" : "")" role="status">@_message</div> }
 
@@ -130,6 +136,7 @@ else
     private readonly Dictionary<Guid, string> _revealLinks = [];
     private bool _isLoading = true;
     private bool _isBusy;
+    private bool _isDeletingExchange;
     private bool _isError;
     private string _message = string.Empty;
     private string InviteUrl => _invitation is null ? string.Empty : $"{Navigation.BaseUri.TrimEnd('/')}{_invitation.Url}";
@@ -207,6 +214,30 @@ else
             _revealLinks[participantId] = await Exchanges.CreateRevealLinkAsync(_exchangeGuid, participantId);
             _message = "Enlace individual listo para compartir.";
         });
+    }
+
+    private async Task DeleteExchangeAsync()
+    {
+        if (_isDeletingExchange || _exchange is null)
+            return;
+
+        _isDeletingExchange = true;
+        _isError = false;
+        try
+        {
+            await Exchanges.DeleteAsync(_exchangeGuid);
+            Navigation.NavigateTo("/admin/exchanges");
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Failed to delete exchange {ExchangeId}.", _exchangeGuid);
+            _isError = true;
+            _message = "No pudimos eliminar el intercambio. Intenta de nuevo.";
+        }
+        finally
+        {
+            _isDeletingExchange = false;
+        }
     }
 
     private async Task RunBusyAsync(Func<Task> action)
