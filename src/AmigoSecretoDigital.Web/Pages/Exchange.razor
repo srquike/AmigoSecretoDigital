@@ -4,6 +4,7 @@
 @inject ExchangeInvitationCache InvitationCache
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject ILogger<Exchange> Logger
 
 <PageTitle>@(_exchange?.Name ?? "Intercambio") · Amigo Secreto</PageTitle>
 @if (_isLoading)
@@ -215,7 +216,12 @@ else
         _isBusy = true;
         _isError = false;
         try { await action(); }
-        catch { _isError = true; _message = "No pudimos completar la operación. Revisa los datos e intenta de nuevo."; }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "Exchange operation failed for exchange {ExchangeId}.", _exchangeGuid);
+            _isError = true;
+            _message = "No pudimos completar la operación. Revisa los registros de la aplicación para conocer el motivo.";
+        }
         finally { _isBusy = false; }
     }
 
