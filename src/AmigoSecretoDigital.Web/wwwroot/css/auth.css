@@ -1,0 +1,17 @@
+.auth-card { max-width: 460px; }
+.join-wrap { width: min(480px, 100%); margin: 12px auto 20px; }
+.join-card { position: relative; overflow: hidden; padding: 34px 38px 28px; text-align: center; }
+.join-decoration { position: absolute; top: 15px; right: 17px; opacity: .18; font-size: 30px; }
+.join-icon { display: grid; place-items: center; width: 53px; height: 53px; margin: 0 auto 17px; border-radius: 16px; background: #f5eee0; font-size: 25px; }
+.join-card .eyebrow { margin-bottom: 8px; }
+.join-card .page-heading { font-size: 27px; }
+.join-card .page-subtitle { margin-bottom: 20px; font-size: 12px; }
+.auth-shell .guest-tag { color: #58745c; }
+.auth-card form { display: grid; gap: 16px; margin-top: 24px; text-align: left; }
+.auth-card .join-submit { width: 100%; }
+.auth-footnote { margin: 18px 0 0; color: #788176; font-size: 12px; text-align: center; }
+.auth-shell .guest-main { display: grid; place-items: center; }
+.logout-form { display: inline-flex; margin: 0; }
+.logout-button { padding: 7px 10px; border: 1px solid #e3e5dc; border-radius: 8px; color: #566155; background: #fff; font-size: 11px; font-weight: 700; cursor: pointer; }
+.logout-button:hover { border-color: #b6c7b7; color: #28583d; }
+@media(max-width: 520px) { .join-wrap { margin-top: 2px; } .join-card { padding: 29px 21px 24px; } .join-card .page-heading { font-size: 24px; } }

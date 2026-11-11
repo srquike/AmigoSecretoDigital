@@ -1,0 +1,24 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: amigo-secreto-digital:local
+    restart: unless-stopped
+    init: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      Supabase__Url: ${SUPABASE_URL:?Define SUPABASE_URL en el archivo .env}
+      Supabase__PublishableKey: ${SUPABASE_PUBLISHABLE_KEY:?Define SUPABASE_PUBLISHABLE_KEY en el archivo .env}
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - app-logs:/app/logs
+      - data-protection-keys:/home/app/.aspnet/DataProtection-Keys
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  app-logs:
+  data-protection-keys:

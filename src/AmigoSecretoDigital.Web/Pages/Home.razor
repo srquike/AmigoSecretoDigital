@@ -1,0 +1,157 @@
+@page "/"
+@page "/admin"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject IExchangeService Exchanges
+
+<PageTitle>Inicio · Amigo Secreto</PageTitle>
+
+<div class="home-intro">
+    <div>
+        <div class="eyebrow">ADMINISTRACIÓN FAMILIAR</div>
+        <h1 class="page-heading">¡Qué gusto verte! <span class="greeting-spark">✦</span></h1>
+        <p class="page-subtitle">La Navidad se disfruta más cuando la preparamos entre todos.</p>
+    </div>
+    <a class="btn btn-light create-shortcut" href="/admin/create"><span>＋</span> Crear intercambio</a>
+</div>
+
+@if (_error is not null)
+{
+    <div class="alert alert-error" role="alert">@_error</div>
+}
+else if (_isLoading)
+{
+    <section class="card card-pad"><p class="card-note">Cargando tus intercambios…</p></section>
+}
+else if (_nextExchange is null)
+{
+    <section class="card card-pad">
+        <div class="eyebrow">TU FAMILIA</div>
+        <h2 class="card-title">Todavía no hay intercambios</h2>
+        <p class="card-note">Crea uno para compartir la invitación con tu familia.</p>
+        <a class="btn btn-primary" href="/admin/create">Crear intercambio <span>→</span></a>
+    </section>
+}
+else
+{
+    var exchange = _nextExchange.Exchange;
+    var minimumParticipantsNeeded = Math.Max(0, ExchangeRules.MinimumParticipants - _nextExchange.ParticipantCount);
+    var expectedCountRemaining = Math.Max(0, exchange.ExpectedParticipants - _nextExchange.ParticipantCount);
+    var progress = exchange.ExpectedParticipants == 0 ? 0 : Math.Min(100, (int)Math.Round(_nextExchange.ParticipantCount * 100d / exchange.ExpectedParticipants));
+    var minimumParticipantsMessage = minimumParticipantsNeeded == 1
+        ? "Falta 1 persona para poder sortear"
+        : $"Faltan {minimumParticipantsNeeded} personas para poder sortear";
+    var nextStepTitle = exchange.Status switch
+    {
+        ExchangeStatus.RegistrationOpen when minimumParticipantsNeeded == 0 => "Ya puedes cerrar la inscripción",
+        ExchangeStatus.RegistrationOpen => minimumParticipantsMessage,
+        ExchangeStatus.ReadyForDraw => "Inscripción cerrada; ya puedes sortear",
+        ExchangeStatus.Drawn => "El sorteo ya está listo",
+        _ => "Revisa el intercambio familiar"
+    };
+    var nextStepDescription = exchange.Status switch
+    {
+        ExchangeStatus.RegistrationOpen => "Comparte la invitación. Puedes cerrar cuando haya al menos 3 participantes, aunque no se alcance la cantidad prevista.",
+        ExchangeStatus.ReadyForDraw => "La lista está cerrada y cumple el mínimo para realizar el sorteo.",
+        ExchangeStatus.Drawn => "Consulta las asignaciones y genera los enlaces privados de revelación.",
+        _ => "Consulta los detalles del intercambio familiar."
+    };
+    var registrationSummary = exchange.Status switch
+    {
+        ExchangeStatus.RegistrationOpen when minimumParticipantsNeeded == 0 => "Ya puedes cerrar la inscripción",
+        ExchangeStatus.RegistrationOpen => minimumParticipantsMessage,
+        ExchangeStatus.ReadyForDraw => "Inscripción cerrada; sorteo pendiente",
+        ExchangeStatus.Drawn => "Asignaciones listas",
+        _ => "Intercambio cancelado"
+    };
+    var progressCaption = exchange.Status == ExchangeStatus.RegistrationOpen
+        ? expectedCountRemaining == 0
+            ? "Cantidad prevista alcanzada; puedes seguir invitando"
+            : $"Faltan {expectedCountRemaining} para llegar a la cantidad prevista"
+        : exchange.Status == ExchangeStatus.ReadyForDraw
+            ? "Lista cerrada; sorteo pendiente"
+            : exchange.Status == ExchangeStatus.Drawn
+                ? "Asignaciones listas para revelar"
+                : "Intercambio cancelado";
+    <section class="hero-card" aria-labelledby="exchange-title">
+        <div class="hero-copy">
+            <div class="hero-kicker"><span class="hero-dot"></span> PRÓXIMO INTERCAMBIO</div>
+            <h2 id="exchange-title">@exchange.Name</h2>
+            <p>Los mejores regalos vienen de compartir un ratito con los nuestros.</p>
+            <div class="hero-meta">
+                <span><span class="meta-icon">▣</span> @exchange.EventDate.ToString("dd 'de' MMMM", SpanishCulture)</span>
+                <span><span class="meta-icon">$</span> @(exchange.Budget is null ? "Sin presupuesto máximo" : $"Tope de ${exchange.Budget:0.##}")</span>
+            </div>
+            <div class="hero-actions"><a class="btn btn-cream" href="@($"/admin/exchange/{exchange.Id}")">Ver intercambio <span>→</span></a></div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+            <div class="art-spark spark-one">✦</div><div class="art-spark spark-two">✧</div>
+            <div class="gift gift-back"></div>
+            <div class="gift gift-front"><span class="gift-ribbon-v"></span><span class="gift-ribbon-h"></span><span class="gift-bow">∞</span></div>
+            <div class="art-caption">un detalle<br />con cariño</div>
+        </div>
+    </section>
+
+    <section class="stats-row" aria-label="Resumen del intercambio">
+        <article class="stat-card card"><div class="stat-icon icon-people">♧</div><div><div class="stat-label">Familia confirmada</div><div class="stat-value">@_nextExchange.ParticipantCount <small>de @exchange.ExpectedParticipants previstos</small></div></div><div class="stat-foot">@registrationSummary</div></article>
+        <article class="stat-card card"><div class="stat-icon icon-calendar">▣</div><div><div class="stat-label">Nos vemos en</div><div class="stat-value">@DaysUntil(exchange.EventDate) <small>días</small></div></div><div class="stat-foot">@exchange.EventDate.ToString("dd 'de' MMMM", SpanishCulture)</div></article>
+        <article class="stat-card card"><div class="stat-icon icon-gift">♧</div><div><div class="stat-label">Presupuesto acordado</div><div class="stat-value">@(exchange.Budget is null ? "—" : $"${exchange.Budget:0.##}") <small>máximo</small></div></div><div class="stat-foot">Un regalo sencillo, con cariño</div></article>
+    </section>
+
+    <div class="home-grid">
+        <section class="card progress-card">
+            <div class="section-heading"><div><h2 class="card-title">Así va la organización</h2><p class="card-note">La cantidad prevista es una meta; el sorteo se habilita desde 3 personas.</p></div><span class="status @StatusClass(exchange.Status)">@StatusLabel(exchange.Status)</span></div>
+            <div class="progress-count"><strong>@_nextExchange.ParticipantCount</strong><span>de @exchange.ExpectedParticipants personas</span><b>@progress%</b></div>
+            <div class="progress-track"><div class="progress-fill" style="width: @progress%"></div></div>
+            <div class="progress-footer"><span>🎄 @progressCaption</span><a href="@($"/admin/exchange/{exchange.Id}")">Ver detalles <span>→</span></a></div>
+        </section>
+        <aside class="phrase-card"><div class="phrase-label"><span>✦</span> CONSEJITO SECRETO</div><div class="phrase-quote">“@GiftPhraseCatalog.All[4]”</div><div class="phrase-byline">— Sabiduría de la familia</div><div class="phrase-decoration" aria-hidden="true">❋</div></aside>
+    </div>
+
+    <section class="next-step card"><div class="next-icon">💌</div><div class="next-copy"><h2 class="card-title">@nextStepTitle</h2><p class="card-note">@nextStepDescription</p></div><a class="btn btn-primary" href="@($"/admin/exchange/{exchange.Id}")">Administrar intercambio <span>→</span></a></section>
+}
+
+@code {
+    private static readonly System.Globalization.CultureInfo SpanishCulture = new("es-SV");
+    private ExchangeSummary? _nextExchange;
+    private bool _isLoading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var exchanges = await Exchanges.GetExchangesAsync();
+            _nextExchange = exchanges
+                .Where(item => item.Exchange.Status != ExchangeStatus.Cancelled)
+                .OrderBy(item => item.Exchange.EventDate < DateOnly.FromDateTime(DateTime.Today))
+                .ThenBy(item => item.Exchange.EventDate)
+                .FirstOrDefault();
+        }
+        catch
+        {
+            _error = "No pudimos cargar tus intercambios. Intenta recargar la página.";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static int DaysUntil(DateOnly date) => Math.Max(0, date.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber);
+
+    private static string StatusLabel(ExchangeStatus status) => status switch
+    {
+        ExchangeStatus.Drawn => "Sorteo listo",
+        ExchangeStatus.ReadyForDraw => "Lista cerrada",
+        ExchangeStatus.Cancelled => "Cancelado",
+        _ => "Inscripciones abiertas"
+    };
+
+    private static string StatusClass(ExchangeStatus status) => status switch
+    {
+        ExchangeStatus.Drawn => "status-drawn",
+        ExchangeStatus.ReadyForDraw => "status-ready",
+        ExchangeStatus.Cancelled => "status-complete",
+        _ => "status-open"
+    };
+}

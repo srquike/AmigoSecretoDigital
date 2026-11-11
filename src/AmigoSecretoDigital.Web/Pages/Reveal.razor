@@ -1,0 +1,68 @@
+@page "/reveal/{RevealCode}"
+@layout GuestLayout
+@inject IExchangeService Exchanges
+
+<PageTitle>Revelar mi asignación · Amigo Secreto</PageTitle>
+<div class="reveal-wrap">
+    <section class="reveal-card card">
+        @if (_assignment is null)
+        {
+            <div class="reveal-icon">🤫</div><div class="eyebrow">TU SORPRESA ESTÁ LISTA</div>
+            <h1 class="page-heading">Revela tu Amigo Secreto</h1>
+            <p class="page-subtitle">Ingresa la frase privada que creaste al registrarte. Solo tú puedes consultar tu resultado.</p>
+            @if (_hasError) { <div class="alert alert-error" role="alert">No pudimos validar el enlace o la frase privada. Revisa e intenta de nuevo.</div> }
+            <form @onsubmit="RevealAssignmentAsync" @onsubmit:preventDefault>
+                <label class="form-field"><span class="form-label">Tu frase privada</span><input class="form-input" type="password" @bind="_accessPhrase" minlength="5" maxlength="256" autocomplete="current-password" placeholder="Escribe tu frase privada" required /><small class="form-hint">Usa la frase que guardaste al registrarte.</small></label>
+                <button class="btn btn-primary reveal-submit" type="submit" disabled="@_isSubmitting">@(_isSubmitting ? "Validando…" : "Revelar mi asignación") <span>✦</span></button>
+            </form>
+            <div class="reveal-lock-note">🔐 El organizador genera el enlace, pero no conoce tu frase privada.</div>
+        }
+        else
+        {
+            <div class="revealed-confetti" aria-hidden="true">✦　·　✧　·　✦</div>
+            <div class="eyebrow">TE TOCÓ REGALARLE A</div>
+            <div class="recipient-avatar">@Initials(_assignment.RecipientName)</div>
+            <h1 class="recipient-name">@_assignment.RecipientName</h1>
+            <p class="recipient-copy">Elegí algo pensando en esa persona.<br />El cariño es lo que cuenta.</p>
+            <div class="secret-ribbon">🤫 Este resultado es solo tuyo</div>
+            <div class="revealed-phrase"><div class="eyebrow">CONSEJITO SALVADOREÑO</div><p>“@_assignment.GiftPhrase”</p></div>
+            <div class="reveal-lock-note">🎄 Guardá el secreto hasta el día del intercambio.</div>
+        }
+    </section>
+</div>
+
+@code {
+    [Parameter] public string? RevealCode { get; set; }
+    private string _accessPhrase = string.Empty;
+    private PrivateAssignment? _assignment;
+    private bool _hasError;
+    private bool _isSubmitting;
+
+    protected override void OnParametersSet()
+    {
+        _assignment = null;
+        _hasError = false;
+        _accessPhrase = string.Empty;
+    }
+
+    private async Task RevealAssignmentAsync()
+    {
+        if (_isSubmitting || string.IsNullOrWhiteSpace(RevealCode)) return;
+        _isSubmitting = true;
+        _hasError = false;
+        try
+        {
+            _assignment = await Exchanges.GetMyAssignmentAsync(RevealCode, _accessPhrase);
+            _hasError = _assignment is null;
+            if (!_hasError) _accessPhrase = string.Empty;
+        }
+        catch
+        {
+            _hasError = true;
+        }
+        finally { _isSubmitting = false; }
+    }
+
+    private static string Initials(string name) => string.Concat(name.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2).Select(part => char.ToUpperInvariant(part[0])));
+}

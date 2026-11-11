@@ -1,0 +1,270 @@
+@page "/admin/exchange/{ExchangeId}"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject IExchangeService Exchanges
+@inject ExchangeInvitationCache InvitationCache
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>@(_exchange?.Name ?? "Intercambio") · Amigo Secreto</PageTitle>
+@if (_isLoading)
+{
+    <section class="card card-pad"><p class="card-note">Cargando el intercambio…</p></section>
+}
+else if (_exchange is null)
+{
+    <section class="card card-pad"><h1 class="page-heading">No encontramos ese intercambio</h1><p class="page-subtitle">Vuelve al listado para elegir otro intercambio familiar.</p><a class="btn btn-primary" href="/admin/exchanges">Ver intercambios <span>→</span></a></section>
+}
+else
+{
+    var hasMinimumParticipants = _participants.Count >= ExchangeRules.MinimumParticipants;
+    <div class="eyebrow">ADMINISTRACIÓN FAMILIAR</div>
+    <div class="page-title-row"><div><h1 class="page-heading">@_exchange.Name</h1><p class="page-subtitle">Invita a los tuyos y prepara el sorteo de diciembre.</p></div><span class="status @StatusClass(_exchange.Status)">@StatusLabel(_exchange.Status)</span></div>
+
+    @if (!string.IsNullOrWhiteSpace(_message)) { <div class="alert @(_isError ? "alert-error" : "")" role="status">@_message</div> }
+
+    <div class="exchange-layout">
+        <div class="exchange-main">
+            <section class="card card-pad event-card">
+                <div class="event-card-heading"><div class="event-icon">🎄</div><div><div class="eyebrow">@_exchange.EventDate.ToString("dd 'DE' MMMM", SpanishCulture) · @_exchange.EventDate.Year</div><h2 class="card-title event-name">@_exchange.Name</h2></div></div>
+                <p class="event-description">@_exchange.Conditions</p>
+                <div class="event-details"><span><b>Presupuesto máximo</b><strong>@(_exchange.Budget is null ? "Sin límite" : $"${_exchange.Budget:0.##} por regalo")</strong></span><span><b>Familia prevista</b><strong>@_exchange.ExpectedParticipants personas</strong></span><span><b>Participantes</b><strong>@_participants.Count registrados</strong></span></div>
+            </section>
+
+            @if (_exchange.Status == ExchangeStatus.Drawn)
+            {
+                <section class="card assignments-card">
+                    <div class="participants-heading"><div><h2 class="card-title">Asignaciones privadas <span class="count-pill">@_assignments.Count</span></h2><p class="card-note">Vista exclusiva de administración. Genera un enlace individual para que cada quien revele su resultado.</p></div></div>
+                    <div class="assignment-list">
+                        @foreach (var assignment in _assignments)
+                        {
+                            <div class="assignment-row">
+                                <span class="avatar @AvatarTone(assignment.ParticipantId)">@Initials(assignment.ParticipantName)</span>
+                                <div class="assignment-pair"><b>@assignment.ParticipantName</b><span>regala a</span><strong>@assignment.RecipientName</strong></div>
+                                @if (_revealLinks.TryGetValue(assignment.ParticipantId, out var revealLink))
+                                {
+                                    <div class="reveal-link-ready"><a href="@revealLink">Abrir revelación ↗</a><button class="copy-small" @onclick="() => CopyLinkAsync(revealLink)">Copiar</button></div>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-light reveal-generate" disabled="@_isBusy" @onclick="() => GenerateRevealLinkAsync(assignment.ParticipantId)">Generar enlace</button>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="participants-footer"><span>🔐 El invitado debe ingresar su frase privada para revelar su asignación.</span></div>
+                </section>
+            }
+            else
+            {
+                <section class="card participants-card">
+                    <div class="participants-heading"><div><h2 class="card-title">Participantes <span class="count-pill">@_participants.Count</span></h2><p class="card-note">No se muestran edades ni otros datos personales en esta lista.</p></div></div>
+                    <div class="participant-list">
+                        @foreach (var (person, index) in _participants.Select((person, index) => (person, index)))
+                        {
+                            <div class="participant-row"><span class="avatar @AvatarTone(person.Id)">@Initials(person.DisplayName)</span><span class="participant-info"><strong>@person.DisplayName</strong><small>Participante registrado</small></span><span class="person-status"><i></i> Confirmado</span></div>
+                        }
+                    </div>
+                    <div class="participants-footer">
+                        @if (_exchange.Status == ExchangeStatus.RegistrationOpen)
+                        {
+                            <span>@(hasMinimumParticipants ? "Ya puedes cerrar la inscripción y sortear." : $"Se necesitan al menos {ExchangeRules.MinimumParticipants} participantes para sortear.")</span>
+                            <span>@_participants.Count de @_exchange.ExpectedParticipants previstos</span>
+                        }
+                        else
+                        {
+                            <span>🔒 La lista está cerrada; el sorteo usará estos participantes.</span>
+                            <span>@_participants.Count participantes</span>
+                        }
+                    </div>
+                </section>
+            }
+        </div>
+
+        <aside class="exchange-aside">
+            <section class="card card-pad invite-card">
+                <div class="small-icon">💌</div><h2 class="card-title">Un enlace para todos</h2><p class="card-note">Comparte este mismo enlace con cada familiar. Cada quien se registra con su nombre y crea su propia frase privada.</p>
+                @if (_invitation is not null)
+                {
+                    <div class="shared-link"><code>@InviteUrl</code><button class="copy-button" @onclick="() => CopyLinkAsync(InviteUrl)">Copiar enlace</button></div>
+                    <a class="open-invite" href="@_invitation.Url">Abrir registro de invitado ↗</a>
+                    <button class="btn btn-light invitation-refresh" disabled="@(_isBusy || _exchange.Status != ExchangeStatus.RegistrationOpen)" @onclick="GenerateInvitationAsync">Renovar enlace de invitación</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary" disabled="@_isBusy" @onclick="GenerateInvitationAsync">Generar enlace de invitación <span>→</span></button>
+                }
+                @if (_exchange.Status != ExchangeStatus.RegistrationOpen) { <div class="invite-closed">Las inscripciones están cerradas.</div> }
+            </section>
+
+            <section class="card card-pad draw-card">
+                <div class="draw-heading"><span class="draw-star">✧</span><div><h2 class="card-title">El sorteo</h2><p class="card-note">Cada participante recibe una asignación distinta.</p></div></div>
+                @if (_exchange.Status == ExchangeStatus.Drawn)
+                {
+                    <div class="draw-state"><span class="draw-check">✓</span><div><b>¡Sorteo completo!</b><small>Genera un enlace de revelación para cada persona.</small></div></div>
+                }
+                else if (_exchange.Status == ExchangeStatus.ReadyForDraw)
+                {
+                    <button class="btn btn-primary draw-button" disabled="@_isBusy" @onclick="DrawAsync">Hacer el sorteo <span>✦</span></button><p class="draw-hint">La lista quedó cerrada. Al sortear se fijan las asignaciones.</p>
+                }
+                else
+                {
+                    <button class="btn btn-primary draw-button" disabled>Cerrar inscripción primero</button>
+                    <p class="draw-hint">@(hasMinimumParticipants ? "Puedes cerrar ahora; no hace falta alcanzar la cantidad prevista." : $"Reúne al menos {ExchangeRules.MinimumParticipants} participantes para cerrar y sortear.")</p>
+                    <button class="btn btn-light close-button" disabled="@(_isBusy || !hasMinimumParticipants)" @onclick="CloseRegistrationAsync">Cerrar inscripciones</button>
+                }
+                <div class="draw-rule"><span>✓</span> Mínimo @ExchangeRules.MinimumParticipants participantes</div>
+            </section>
+        </aside>
+    </div>
+}
+
+@code {
+    private static readonly System.Globalization.CultureInfo SpanishCulture = new("es-SV");
+    [Parameter] public string? ExchangeId { get; set; }
+
+    private Guid _exchangeGuid;
+    private AmigoSecretoDigital.Domain.Exchange? _exchange;
+    private IReadOnlyList<AdminParticipant> _participants = [];
+    private IReadOnlyList<AdminAssignment> _assignments = [];
+    private Invitation? _invitation;
+    private readonly Dictionary<Guid, string> _revealLinks = [];
+    private bool _isLoading = true;
+    private bool _isBusy;
+    private bool _isError;
+    private string _message = string.Empty;
+    private string InviteUrl => _invitation is null ? string.Empty : $"{Navigation.BaseUri.TrimEnd('/')}{_invitation.Url}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        _message = string.Empty;
+        _exchange = null;
+        _participants = [];
+        _assignments = [];
+        _invitation = null;
+        _revealLinks.Clear();
+
+        if (!Guid.TryParse(ExchangeId, out _exchangeGuid))
+        {
+            _isLoading = false;
+            return;
+        }
+
+        try
+        {
+            _exchange = await Exchanges.GetExchangeAsync(_exchangeGuid);
+            if (_exchange is not null)
+            {
+                _participants = await Exchanges.GetParticipantsAsync(_exchangeGuid);
+                if (_exchange.Status == ExchangeStatus.Drawn)
+                    _assignments = await Exchanges.GetAssignmentsAsync(_exchangeGuid);
+                if (InvitationCache.TryGet(_exchange.OrganizerId, _exchange.Id, out var invitation))
+                    _invitation = invitation;
+            }
+        }
+        catch
+        {
+            _isError = true;
+            _message = "No pudimos cargar este intercambio. Intenta recargar la página.";
+        }
+        finally { _isLoading = false; }
+    }
+
+    private async Task GenerateInvitationAsync()
+    {
+        await RunBusyAsync(async () =>
+        {
+            _invitation = await Exchanges.CreateInvitationAsync(_exchangeGuid);
+            InvitationCache.Set(_exchange!.OrganizerId, _exchange.Id, _invitation);
+            _message = "Enlace listo para compartir con toda la familia.";
+        });
+    }
+
+    private async Task CloseRegistrationAsync()
+    {
+        await RunBusyAsync(async () =>
+        {
+            await Exchanges.CloseRegistrationAsync(_exchangeGuid);
+            _message = "Inscripciones cerradas. Ya puedes hacer el sorteo.";
+            await ReloadAsync();
+        });
+    }
+
+    private async Task DrawAsync()
+    {
+        await RunBusyAsync(async () =>
+        {
+            await Exchanges.DrawAsync(_exchangeGuid);
+            _message = "Sorteo realizado. Genera un enlace privado para cada participante.";
+            await ReloadAsync();
+        });
+    }
+
+    private async Task GenerateRevealLinkAsync(Guid participantId)
+    {
+        await RunBusyAsync(async () =>
+        {
+            _revealLinks[participantId] = await Exchanges.CreateRevealLinkAsync(_exchangeGuid, participantId);
+            _message = "Enlace individual listo para compartir.";
+        });
+    }
+
+    private async Task RunBusyAsync(Func<Task> action)
+    {
+        if (_isBusy) return;
+        _isBusy = true;
+        _isError = false;
+        try { await action(); }
+        catch { _isError = true; _message = "No pudimos completar la operación. Revisa los datos e intenta de nuevo."; }
+        finally { _isBusy = false; }
+    }
+
+    private async Task ReloadAsync()
+    {
+        _exchange = await Exchanges.GetExchangeAsync(_exchangeGuid);
+        _participants = await Exchanges.GetParticipantsAsync(_exchangeGuid);
+        _assignments = _exchange?.Status == ExchangeStatus.Drawn
+            ? await Exchanges.GetAssignmentsAsync(_exchangeGuid)
+            : [];
+    }
+
+    private async Task CopyLinkAsync(string link)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("amigoSecreto.copyText", link);
+            _isError = false;
+            _message = "Enlace copiado. Puedes enviarlo a la persona correspondiente.";
+        }
+        catch (JSException)
+        {
+            _isError = true;
+            _message = $"No se pudo copiar automáticamente. Copia este enlace: {link}";
+        }
+    }
+
+    private string AvatarTone(Guid participantId)
+    {
+        var index = (int)((uint)participantId.GetHashCode() % 4);
+        return new[] { "avatar-green", "avatar-sand", "avatar-rose", "avatar-blue" }[index];
+    }
+
+    private static string Initials(string name) => string.Concat(name.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2).Select(part => char.ToUpperInvariant(part[0])));
+
+    private static string StatusLabel(ExchangeStatus status) => status switch
+    {
+        ExchangeStatus.Drawn => "Sorteo realizado",
+        ExchangeStatus.ReadyForDraw => "Inscripción cerrada",
+        ExchangeStatus.Cancelled => "Cancelado",
+        _ => "Inscripciones abiertas"
+    };
+
+    private static string StatusClass(ExchangeStatus status) => status switch
+    {
+        ExchangeStatus.Drawn => "status-drawn",
+        ExchangeStatus.ReadyForDraw => "status-ready",
+        ExchangeStatus.Cancelled => "status-complete",
+        _ => "status-open"
+    };
+}

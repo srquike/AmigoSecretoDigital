@@ -1,0 +1,94 @@
+@page "/join/{ExchangeCode}"
+@layout GuestLayout
+@inject IExchangeService Exchanges
+
+<PageTitle>Unirme al intercambio · Amigo Secreto</PageTitle>
+<div class="join-wrap">
+    <section class="join-card card">
+        <div class="join-decoration">🎄</div>
+        @if (_joined)
+        {
+            <div class="join-success-icon">✓</div><div class="eyebrow">¡YA ERES PARTE!</div>
+            <h1 class="page-heading">Qué alegre, @_displayName</h1>
+            <p class="page-subtitle">Tu registro quedó listo. Guarda tu frase privada; la necesitarás para revelar tu asignación cuando recibas tu enlace personal.</p>
+            <div class="join-privacy">🔐 Tu frase se almacena protegida y no se muestra al organizador.</div>
+        }
+        else if (_isLoading)
+        {
+            <div class="join-icon">💌</div><div class="eyebrow">INVITACIÓN FAMILIAR</div>
+            <h1 class="page-heading">Revisando la invitación…</h1>
+            <p class="page-subtitle">Un momento mientras confirmamos que siga disponible.</p>
+        }
+        else if (_invitation is null)
+        {
+            <div class="join-icon">💌</div><div class="eyebrow">INVITACIÓN FAMILIAR</div>
+            <h1 class="page-heading">Este enlace no está disponible</h1>
+            <p class="page-subtitle">Puede que las inscripciones estén cerradas o que el enlace haya vencido o sido renovado.</p>
+        }
+        else
+        {
+            <div class="join-icon">💌</div><div class="eyebrow">TE INVITARON A PARTICIPAR</div>
+            <h1 class="page-heading">¡Súmate al Amigo Secreto!</h1>
+            <p class="page-subtitle">Completa tus datos para unirte a <strong>@_invitation.ExchangeName</strong>. Toda la familia usa este mismo enlace.</p>
+            <div class="join-event"><span>📅</span><span><b>@_invitation.EventDate.ToString("dd 'de' MMMM", SpanishCulture)</b><small>Intercambio de regalos en familia</small></span></div>
+            @if (_errors.Count > 0) { <div class="alert alert-error" role="alert">@foreach (var error in _errors) { <div>@error</div> }</div> }
+            <form @onsubmit="SubmitAsync" @onsubmit:preventDefault>
+                <label class="form-field"><span class="form-label">Tu nombre o apodo</span><input class="form-input" @bind="_displayName" maxlength="60" placeholder="Ej. Ana, Tío Beto..." required /></label>
+                <div class="form-grid join-form-grid">
+                    <label class="form-field"><span class="form-label">Edad</span><input class="form-input" type="number" @bind="_age" min="1" max="120" required /></label>
+                    <label class="form-field"><span class="form-label">Sexo</span><select class="form-input" @bind="_sex"><option value="NotSpecified">Prefiero no decir</option><option value="Female">Mujer</option><option value="Male">Hombre</option><option value="Other">Otro</option></select></label>
+                </div>
+                <label class="form-field access-field"><span class="form-label">Crea una frase privada</span><input class="form-input" type="password" @bind="_accessPhrase" minlength="5" maxlength="10" autocomplete="new-password" placeholder="De 5 a 10 caracteres" required /><small class="form-hint">No la compartas. La usarás en el enlace de revelación para consultar a quién te tocó.</small></label>
+                <button class="btn btn-primary join-submit" type="submit" disabled="@_isSubmitting">@(_isSubmitting ? "Guardando…" : "Unirme al intercambio") <span>→</span></button>
+            </form>
+            <div class="join-privacy">🔒 Tu frase privada nunca se incluye en el listado de participantes.</div>
+        }
+    </section>
+</div>
+
+@code {
+    private static readonly System.Globalization.CultureInfo SpanishCulture = new("es-SV");
+    [Parameter] public string? ExchangeCode { get; set; }
+    private InvitationContext? _invitation;
+    private string _displayName = string.Empty;
+    private int _age = 25;
+    private Sex _sex = Sex.NotSpecified;
+    private string _accessPhrase = string.Empty;
+    private bool _joined;
+    private bool _isLoading = true;
+    private bool _isSubmitting;
+    private readonly List<string> _errors = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _isLoading = true;
+        _joined = false;
+        _errors.Clear();
+        _invitation = string.IsNullOrWhiteSpace(ExchangeCode)
+            ? null
+            : await Exchanges.GetInvitationContextAsync(ExchangeCode);
+        _isLoading = false;
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (_isSubmitting || _invitation is null || ExchangeCode is null) return;
+        _errors.Clear();
+        _errors.AddRange(ExchangeRules.ValidateParticipant(_displayName, _age, _sex));
+        _errors.AddRange(ExchangeRules.ValidateParticipantAccessPhrase(_accessPhrase));
+        if (_errors.Count > 0) return;
+
+        _isSubmitting = true;
+        try
+        {
+            await Exchanges.JoinAsync(new JoinExchangeRequest(ExchangeCode, _displayName.Trim(), _age, _sex, _accessPhrase));
+            _joined = true;
+            _accessPhrase = string.Empty;
+        }
+        catch
+        {
+            _errors.Add("No pudimos completar el registro. Revisa los datos o pide un enlace actualizado al organizador.");
+        }
+        finally { _isSubmitting = false; }
+    }
+}

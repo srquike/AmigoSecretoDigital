@@ -1,0 +1,71 @@
+@page "/admin/exchanges"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject IExchangeService Exchanges
+
+<PageTitle>Intercambios · Amigo Secreto</PageTitle>
+<div class="eyebrow">ADMINISTRACIÓN FAMILIAR</div>
+<div class="list-title-row">
+    <div><h1 class="page-heading">Intercambios</h1><p class="page-subtitle">Consulta y administra los intercambios de tu familia.</p></div>
+    <a class="btn btn-primary" href="/admin/create"><span>＋</span> Crear intercambio</a>
+</div>
+
+@if (_error is not null)
+{
+    <div class="alert alert-error" role="alert">@_error</div>
+}
+else if (_isLoading)
+{
+    <section class="card card-pad"><p class="card-note">Cargando intercambios…</p></section>
+}
+else if (_exchanges.Count == 0)
+{
+    <section class="card card-pad"><h2 class="card-title">Aún no has creado intercambios</h2><p class="card-note">Al crear uno, aparecerá aquí para que puedas administrarlo.</p><a class="btn btn-primary" href="/admin/create">Crear intercambio <span>→</span></a></section>
+}
+else
+{
+    <div class="list-summary"><span class="list-summary-icon">🎄</span><div><b>@_exchanges.Count intercambios familiares</b><small>Próximas celebraciones y recuerdos de años anteriores.</small></div></div>
+
+    <section class="exchange-list-grid" aria-label="Lista de intercambios">
+        @foreach (var item in _exchanges)
+        {
+            var exchange = item.Exchange;
+            <article class="exchange-list-card card">
+                <div class="list-card-top"><div class="list-card-icon">🎁</div><span class="status @StatusClass(exchange.Status)">@StatusLabel(exchange.Status)</span></div>
+                <h2>@exchange.Name</h2>
+                <div class="list-card-date">📅 <span>@exchange.EventDate.ToString("dd 'de' MMMM 'de' yyyy", SpanishCulture)</span></div>
+                <div class="list-card-meta"><span><b>Registrados / previstos</b><strong>@item.ParticipantCount / @exchange.ExpectedParticipants</strong></span><span><b>Presupuesto</b><strong>@(exchange.Budget is null ? "Sin límite" : $"${exchange.Budget:0.##}")</strong></span></div>
+                <div class="list-card-bottom"><span class="current-tag current-tag-empty">&nbsp;</span><a class="btn btn-light" href="@($"/admin/exchange/{exchange.Id}")">Ver detalle <span>→</span></a></div>
+            </article>
+        }
+    </section>
+}
+
+@code {
+    private static readonly System.Globalization.CultureInfo SpanishCulture = new("es-SV");
+    private IReadOnlyList<ExchangeSummary> _exchanges = [];
+    private bool _isLoading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { _exchanges = await Exchanges.GetExchangesAsync(); }
+        catch { _error = "No pudimos cargar los intercambios. Intenta recargar la página."; }
+        finally { _isLoading = false; }
+    }
+
+    private static string StatusLabel(ExchangeStatus status) => status switch
+    {
+        ExchangeStatus.Drawn => "Sorteo realizado",
+        ExchangeStatus.ReadyForDraw => "Inscripción cerrada",
+        ExchangeStatus.Cancelled => "Cancelado",
+        _ => "Inscripciones abiertas"
+    };
+
+    private static string StatusClass(ExchangeStatus status) => status switch
+    {
+        ExchangeStatus.Drawn => "status-drawn",
+        ExchangeStatus.ReadyForDraw => "status-ready",
+        ExchangeStatus.Cancelled => "status-complete",
+        _ => "status-open"
+    };
+}

@@ -1,0 +1,67 @@
+.page-title-row { display:flex; align-items:flex-start; justify-content:space-between; gap:15px; }
+.page-title-row .page-subtitle { margin-bottom:22px; }
+.page-title-row>.status { margin-top:5px; }
+.exchange-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(250px,.9fr); align-items:start; gap:15px; }
+.exchange-main,.exchange-aside { display:grid; gap:15px; }
+.event-card { padding:20px 22px; }
+.event-card-heading { display:flex; align-items:center; gap:13px; }
+.event-icon { display:grid; place-items:center; flex:0 0 auto; width:45px; height:45px; border-radius:13px; background:#f1f4e9; font-size:23px; }
+.event-card-heading .eyebrow { margin-bottom:4px; font-size:8px; }
+.event-name { font-size:17px; }
+.event-description { margin:15px 0 16px; color:#737d73; font-size:11px; line-height:1.6; }
+.event-details { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding-top:14px; border-top:1px solid #efede5; }
+.event-details span { display:grid; gap:5px; }
+.event-details b { color:#969b91; font-size:9px; font-weight:600; }
+.event-details strong { color:#38493b; font-size:10px; }
+.participants-card,.assignments-card { overflow:hidden; }
+.participants-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:19px 21px 16px; }
+.participants-heading .card-title { display:flex; align-items:center; gap:9px; }
+.count-pill { display:inline-grid; place-items:center; min-width:33px; height:20px; padding:0 7px; border-radius:99px; color:#4c7254; background:#eaf2e8; font-family:inherit; font-size:9px; }
+.text-action { color:#457052; font-size:9px; font-weight:750; text-decoration:none; white-space:nowrap; }
+.participant-row,.assignment-row { display:flex; align-items:center; gap:11px; min-height:60px; padding:10px 21px; border-top:1px solid #f0eee7; }
+.participant-info { display:grid; flex:1; gap:4px; min-width:0; }
+.participant-info strong { overflow:hidden; color:#344438; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+.participant-info small { color:#90968e; font-size:9px; }
+.avatar-sand { color:#8a612c; background:#f5e9d3; }
+.avatar-rose { color:#944f56; background:#f6e3e4; }
+.avatar-blue { color:#4a6383; background:#e4eaf4; }
+.person-status { display:flex; align-items:center; gap:5px; color:#54805a; font-size:9px; white-space:nowrap; }
+.person-status i { width:6px; height:6px; border-radius:50%; background:#78a57b; }
+.participants-footer { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:13px 21px; color:#8b9189; background:#faf9f4; font-size:9px; }
+.participants-footer span:last-child { white-space:nowrap; }
+.assignment-pair { display:grid; flex:1; gap:3px; min-width:0; }
+.assignment-pair b { color:#899187; font-size:9px; font-weight:600; }
+.assignment-pair span { color:#a0a59d; font-size:8px; }
+.assignment-pair strong { overflow:hidden; color:#2e543c; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+.reveal-generate { flex:0 0 auto; min-height:34px; padding:0 10px; font-size:9px; }
+.reveal-link-ready { display:grid; justify-items:end; gap:4px; flex:0 0 auto; }
+.reveal-link-ready a { color:#3f704c; font-size:9px; font-weight:750; text-decoration:none; }
+.copy-small { padding:0; border:0; color:#8d948b; background:transparent; font-size:8px; cursor:pointer; }
+.invite-card .small-icon { margin-bottom:9px; font-size:21px; }
+.invite-card .card-note { margin:6px 0 14px; }
+.shared-link { overflow:hidden; padding:11px; border:1px solid #e5e9df; border-radius:9px; background:#fff; }
+.shared-link code { display:block; overflow:hidden; color:#657264; font-size:9px; text-overflow:ellipsis; white-space:nowrap; }
+.copy-button { width:100%; min-height:32px; margin-top:9px; border:0; border-radius:7px; color:white; background:#315f45; font-size:10px; font-weight:750; cursor:pointer; }
+.copy-button:hover { background:#244d37; }
+.open-invite { display:block; margin-top:10px; color:#4b7552; font-size:9px; font-weight:700; text-align:center; text-decoration:none; }
+.invitation-refresh { width:100%; margin-top:8px; font-size:10px; }
+.invite-closed { margin-top:11px; color:#a66b3a; font-size:9px; text-align:center; }
+.draw-card { border-color:#e0e9dd; background:#f7faf4; }
+.draw-heading { display:flex; align-items:flex-start; gap:10px; }
+.draw-star { color:#ba944d; font-size:24px; }
+.draw-heading .card-title { margin-top:2px; }
+.draw-heading .card-note { margin-top:5px; }
+.draw-button { width:100%; margin-top:18px; }
+.draw-hint { margin:8px 0 0; color:#8c9489; font-size:9px; line-height:1.5; text-align:center; }
+.close-button { width:100%; margin-top:10px; }
+.draw-rule { margin-top:16px; padding-top:13px; border-top:1px solid #e4ebdf; color:#7e897c; font-size:9px; }
+.draw-rule span { margin-right:7px; color:#629366; }
+.draw-state { display:flex; align-items:center; gap:9px; margin-top:16px; padding:11px; border-radius:9px; background:#eaf3e8; }
+.draw-check { display:grid; place-items:center; width:25px; height:25px; border-radius:50%; color:white; background:#5d9165; font-weight:800; }
+.draw-state div { display:grid; gap:3px; }
+.draw-state b { color:#3e6546; font-size:10px; }
+.draw-state small { color:#768d77; font-size:9px; }
+.demo-notice { padding:11px 13px; border:1px dashed #e8dcbf; border-radius:9px; color:#8c7958; background:#fffaf0; font-size:9px; line-height:1.6; }
+.demo-notice b { color:#79613b; }
+@media(max-width:1200px) { .exchange-layout { grid-template-columns:1fr; } .exchange-aside { grid-template-columns:1fr 1fr; align-items:start; } .demo-notice { grid-column:1/-1; } }
+@media(max-width:600px) { .page-title-row { display:block; } .page-title-row>.status { display:inline-flex; margin:0 0 14px; } .exchange-aside { grid-template-columns:1fr; } .event-details { grid-template-columns:1fr 1fr; } .event-details span:last-child { grid-column:1/-1; } .participants-heading,.participant-row,.assignment-row,.participants-footer { padding-right:13px; padding-left:13px; } .participants-heading { align-items:flex-start; } .participants-footer { align-items:flex-start; flex-direction:column; } .person-status { font-size:0; } .person-status i { width:7px; height:7px; } .assignment-row { gap:7px; } .reveal-generate { padding:0 7px; font-size:8px; } }

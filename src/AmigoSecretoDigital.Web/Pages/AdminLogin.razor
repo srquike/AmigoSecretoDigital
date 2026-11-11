@@ -1,0 +1,45 @@
+@page "/admin/login"
+@layout AuthLayout
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@inject IConfiguration Configuration
+
+<PageTitle>Acceso de organizador · Amigo Secreto</PageTitle>
+<div class="join-wrap">
+    <section class="join-card card auth-card">
+        <div class="join-decoration">🎄</div>
+        <div class="join-icon">🔐</div>
+        <div class="eyebrow">ACCESO DE ORGANIZADOR</div>
+        <h1 class="page-heading">Qué bueno verte</h1>
+        <p class="page-subtitle">Inicia sesión para administrar los intercambios de tu familia.</p>
+
+        @if (!IsSupabaseConfigured)
+        {
+            <div class="alert alert-warning" role="status">Configura Supabase para habilitar el acceso de organizador.</div>
+        }
+        else
+        {
+            @if (HasError)
+            {
+                <div class="alert alert-error" role="alert">No pudimos iniciar sesión. Revisa tu correo y contraseña e intenta de nuevo.</div>
+            }
+            <form action="/auth/sign-in" method="post">
+                <AntiforgeryToken />
+                <label class="form-field"><span class="form-label">Correo electrónico</span><input class="form-input" type="email" name="email" autocomplete="username" maxlength="254" required /></label>
+                <label class="form-field"><span class="form-label">Contraseña</span><input class="form-input" type="password" name="password" autocomplete="current-password" maxlength="256" required /></label>
+                <button class="btn btn-primary join-submit" type="submit">Iniciar sesión <span>→</span></button>
+            </form>
+            <p class="auth-footnote">Las cuentas de organizador se administran desde Supabase.</p>
+        }
+    </section>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? Error { get; set; }
+
+    private bool IsSupabaseConfigured =>
+        !string.IsNullOrWhiteSpace(Configuration["Supabase:Url"]) &&
+        !string.IsNullOrWhiteSpace(Configuration["Supabase:PublishableKey"]);
+
+    private bool HasError => Error == "1";
+}

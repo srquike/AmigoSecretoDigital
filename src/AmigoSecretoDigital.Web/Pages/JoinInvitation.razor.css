@@ -1,0 +1,12 @@
+.join-card .page-subtitle strong { color: #385d43; }
+.join-event { display: flex; align-items: center; gap: 10px; margin-bottom: 19px; padding: 11px 13px; border: 1px solid #ecece2; border-radius: 10px; background: #fafaf5; text-align: left; }
+.join-event > span:first-child { font-size: 19px; }
+.join-event > span:last-child { display: grid; gap: 3px; }
+.join-event b { color: #405745; font-size: 10px; }
+.join-event small { color: #93988e; font-size: 9px; }
+.join-card form { display: grid; gap: 14px; text-align: left; }
+.join-form-grid { gap: 12px; }
+.access-field { margin-top: 1px; }
+.join-submit { width: 100%; margin-top: 3px; }
+.join-privacy { margin-top: 18px; color: #8a9686; font-size: 9px; }
+.join-success-icon { display: grid; place-items: center; width: 54px; height: 54px; margin: 0 auto 15px; border-radius: 50%; color: #fff; background: #5d9268; font-size: 25px; }

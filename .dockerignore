@@ -1,0 +1,14 @@
+.git
+.vs
+.codex
+**/bin/
+**/obj/
+**/logs/
+artifacts/
+supabase/
+.env
+.env.*
+!.env.example
+**/*.user
+**/*.suo
+**/appsettings.*.local.json

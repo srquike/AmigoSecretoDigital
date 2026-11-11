@@ -1,0 +1,80 @@
+@page "/admin/create"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject IExchangeService Exchanges
+@inject ExchangeInvitationCache InvitationCache
+@inject NavigationManager Navigation
+
+<PageTitle>Crear intercambio · Amigo Secreto</PageTitle>
+<a class="back-link" href="/">← Volver al inicio</a>
+<div class="create-layout">
+    <section class="create-form-area">
+        <div class="eyebrow">NUEVO INTERCAMBIO</div>
+        <h1 class="page-heading">Preparemos la sorpresa</h1>
+        <p class="page-subtitle">Completa los detalles y luego invita a tu familia.</p>
+        <section class="card card-pad create-form-card">
+            <h2 class="card-title">Los detalles</h2>
+            <p class="card-note create-card-note">Puedes ajustar las condiciones antes de realizar el sorteo.</p>
+            <form @onsubmit="Submit" @onsubmit:preventDefault>
+                <div class="form-grid">
+                    <label class="form-field full"><span class="form-label">Nombre del intercambio</span><input class="form-input" @bind="_name" maxlength="80" placeholder="Ej. Navidad en familia" required /></label>
+                    <label class="form-field"><span class="form-label">Fecha del intercambio</span><input class="form-input" type="date" @bind="_eventDate" required /></label>
+                    <label class="form-field"><span class="form-label">Personas previstas</span><input class="form-input" type="number" @bind="_expectedParticipants" min="3" max="100" required /><small class="form-hint">Es una meta estimada; puedes cerrar la inscripción desde 3 participantes.</small></label>
+                    <label class="form-field"><span class="form-label">Presupuesto máximo <small>(opcional)</small></span><div class="budget-input"><span>$</span><input class="form-input" type="number" min="0" step="1" @bind="_budget" placeholder="25" /></div><small class="form-hint">En dólares estadounidenses.</small></label>
+                    <label class="form-field full"><span class="form-label">Condiciones o instrucciones</span><textarea class="form-input" @bind="_conditions" maxlength="2000" placeholder="¿Alguna temática? ¿Algo que deban saber?"></textarea><small class="form-hint">Estas condiciones las podrán leer todos los participantes.</small></label>
+                </div>
+                @if (_errors.Count > 0) { <ul class="error-list">@foreach (var error in _errors) { <li>@error</li> }</ul> }
+                <div class="create-actions"><a class="btn btn-light" href="/admin/exchanges">Cancelar</a><button class="btn btn-primary" type="submit" disabled="@_isSaving">@(_isSaving ? "Creando…" : "Crear intercambio") <span>→</span></button></div>
+            </form>
+        </section>
+    </section>
+    <aside class="create-aside">
+        <div class="create-illustration"><div class="illustration-star">✦</div><div class="illustration-box">🎁</div><div class="illustration-leaf">✧</div></div>
+        <h2>Una tradición<br />que nos reúne</h2>
+        <p>Después de crear el intercambio, compartirás un único enlace con toda la familia.</p>
+        <div class="aside-steps"><span><b>1</b> Define la fecha y las reglas</span><span><b>2</b> Invita a tus familiares</span><span><b>3</b> Sortea cuando todos estén</span></div>
+    </aside>
+</div>
+
+@code {
+    private string _name = string.Empty;
+    private DateOnly _eventDate = new(2026, 12, 24);
+    private decimal? _budget = 25;
+    private int _expectedParticipants = 8;
+    private string _conditions = string.Empty;
+    private bool _isSaving;
+    private readonly List<string> _errors = [];
+
+    private async Task Submit()
+    {
+        if (_isSaving) return;
+        _errors.Clear();
+        _errors.AddRange(ExchangeRules.ValidateCreation(_name, _eventDate, _conditions, _budget, _expectedParticipants, DateOnly.FromDateTime(DateTime.Today)));
+        if (_errors.Count > 0) return;
+
+        _isSaving = true;
+        AmigoSecretoDigital.Domain.Exchange exchange;
+        try
+        {
+            exchange = await Exchanges.CreateAsync(new CreateExchangeRequest(
+                _name, _eventDate, _conditions, _budget, _expectedParticipants));
+        }
+        catch
+        {
+            _errors.Add("No pudimos crear el intercambio. Revisa los datos e intenta de nuevo.");
+            _isSaving = false;
+            return;
+        }
+
+        try
+        {
+            var invitation = await Exchanges.CreateInvitationAsync(exchange.Id);
+            InvitationCache.Set(exchange.OrganizerId, exchange.Id, invitation);
+        }
+        catch
+        {
+            // The exchange is already persisted; its detail page lets the organizer retry link generation.
+        }
+
+        Navigation.NavigateTo($"/admin/exchange/{exchange.Id}");
+    }
+}

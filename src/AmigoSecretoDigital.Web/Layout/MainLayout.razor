@@ -1,0 +1,48 @@
+@inherits LayoutComponentBase
+@inject IConfiguration Configuration
+
+<div class="app-frame">
+    <aside class="sidebar">
+        <a class="brand" href="/admin" aria-label="Amigo Secreto, inicio">
+            <span class="brand-mark">🎁</span>
+            <span class="brand-name">amigo<span>secreto</span></span>
+        </a>
+        <div class="sidebar-caption">TU FAMILIA</div>
+        <nav class="side-nav" aria-label="Navegación principal">
+            <NavLink href="/admin" Match="NavLinkMatch.All"><span class="nav-icon">⌂</span>Inicio</NavLink>
+            <NavLink href="/admin/exchanges"><span class="nav-icon">✦</span>Intercambios</NavLink>
+            <NavLink href="/admin/create"><span class="nav-icon">＋</span>Crear intercambio</NavLink>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="sidebar-note-icon">✨</div>
+            <p>Un detalle con cariño<br />hace bonita la Navidad.</p>
+            <span>Hecho con cariño en El Salvador</span>
+        </div>
+    </aside>
+    <main class="main-area">
+        <header class="topbar">
+            <div class="mobile-brand"><span>🎁</span> amigo secreto</div>
+            @if (string.IsNullOrWhiteSpace(Configuration["Supabase:Url"]))
+            {
+                <div class="demo-pill"><span></span> MODO DE PRUEBA</div>
+            }
+            else
+            {
+                <div class="demo-pill"><span></span> ADMINISTRACIÓN PRIVADA</div>
+            }
+            <AuthorizeView>
+                <Authorized Context="authState">
+                    <div class="profile-chip"><span class="avatar avatar-green">O</span><span>@authState.User.Identity?.Name</span></div>
+                    <form action="/auth/sign-out" method="post" class="logout-form"><AntiforgeryToken /><button class="logout-button" type="submit">Salir</button></form>
+                </Authorized>
+            </AuthorizeView>
+        </header>
+        <nav class="mobile-nav" aria-label="Navegación principal">
+            <NavLink href="/admin" Match="NavLinkMatch.All"><span>⌂</span>Inicio</NavLink>
+            <NavLink href="/admin/exchanges"><span>✦</span>Intercambios</NavLink>
+            <NavLink href="/admin/create"><span>＋</span>Crear</NavLink>
+        </nav>
+        <div class="page-content">@Body</div>
+        <footer class="app-footer"><span>Amigo Secreto Digital</span><span>Una tradición que nos reúne 🎄</span></footer>
+    </main>
+</div>

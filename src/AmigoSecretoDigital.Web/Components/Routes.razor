@@ -1,0 +1,30 @@
+<Router AppAssembly="@typeof(Program).Assembly" NotFoundPage="typeof(NotFound)">
+    <Found Context="routeData">
+        @if (IsSupabaseConfigured)
+        {
+            <AuthorizeRouteView RouteData="routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <LayoutView Layout="@typeof(MainLayout)">
+                        <div class="eyebrow">ACCESO DE ORGANIZADOR</div>
+                        <h1 class="page-heading">Inicia sesión para continuar</h1>
+                        <p class="page-subtitle">Esta sección es solo para quien organiza los intercambios.</p>
+                        <a class="btn btn-primary" href="/admin/login">Iniciar sesión <span>→</span></a>
+                    </LayoutView>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        }
+        else
+        {
+            <RouteView RouteData="routeData" DefaultLayout="@typeof(MainLayout)" />
+        }
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+</Router>
+
+@code {
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
+
+    private bool IsSupabaseConfigured =>
+        !string.IsNullOrWhiteSpace(Configuration["Supabase:Url"]) &&
+        !string.IsNullOrWhiteSpace(Configuration["Supabase:PublishableKey"]);
+}
