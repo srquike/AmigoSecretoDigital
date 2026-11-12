@@ -60,4 +60,34 @@
 .next-copy .card-note { font-size:10px; }
 .next-step .btn { min-height:36px; font-size:10px; }
 @media(max-width:900px) { .stats-row { grid-template-columns:1fr 1fr; } .home-grid { grid-template-columns:1fr; } }
-@media(max-width:600px) { .home-intro { align-items:flex-start; } .create-shortcut { width:40px; min-width:40px; overflow:hidden; padding:0; font-size:0; } .create-shortcut span { font-size:21px; } .hero-card { min-height:315px; } .hero-copy { width:100%; padding:24px 21px; } .hero-copy p { max-width:80%; } .hero-meta { flex-wrap:wrap; gap:10px 17px; max-width:78%; } .hero-art { top:auto; bottom:0; width:55%; height:155px; opacity:.75; } .gift-front { right:37%; bottom:22px; width:77px; height:60px; } .gift-back { right:12%; bottom:23px; width:78px; height:76px; } .gift-ribbon-v { width:9px; } .gift-ribbon-h { height:9px; } .gift-bow { top:-23px; left:25px; font-size:35px; } .art-caption { bottom:8px; font-size:9px; } .hero-actions { position:relative; z-index:2; margin-top:18px; } .hero-actions .btn { font-size:10px; } .hero-text-link { font-size:9px; } .stats-row { grid-template-columns:1fr; } .stat-card { min-height:86px; } .next-step { align-items:flex-start; flex-wrap:wrap; } .next-copy { min-width:calc(100% - 55px); } .next-step .btn { width:100%; } .progress-card { padding:17px; } .phrase-card { min-height:165px; } }
+@media(max-width:600px) {
+    .home-intro { align-items:flex-start; }
+    .home-intro .page-heading { font-size:clamp(25px,7vw,30px); }
+    .create-shortcut { width:40px; min-width:40px; overflow:hidden; padding:0; font-size:0; }
+    .create-shortcut span { font-size:21px; }
+    .hero-card { min-height:315px; }
+    .hero-copy { width:100%; padding:24px 21px; }
+    .hero-copy p { max-width:80%; }
+    .hero-meta { flex-wrap:wrap; gap:10px 17px; max-width:78%; }
+    .hero-art { top:auto; bottom:0; width:55%; height:155px; opacity:.75; }
+    .gift-front { right:37%; bottom:22px; width:77px; height:60px; }
+    .gift-back { right:12%; bottom:23px; width:78px; height:76px; }
+    .gift-ribbon-v { width:9px; }
+    .gift-ribbon-h { height:9px; }
+    .gift-bow { top:-23px; left:25px; font-size:35px; }
+    .art-caption { bottom:8px; font-size:9px; }
+    .hero-actions { position:relative; z-index:2; margin-top:18px; }
+    .hero-actions .btn { font-size:10px; }
+    .hero-text-link { font-size:9px; }
+    .stats-row { grid-template-columns:1fr; }
+    .stat-card { min-height:86px; }
+    .section-heading { align-items:flex-start; flex-wrap:wrap; }
+    .section-heading .card-title { min-width:0; }
+    .progress-count { flex-wrap:wrap; }
+    .progress-footer { align-items:flex-start; flex-wrap:wrap; }
+    .next-step { align-items:flex-start; flex-wrap:wrap; }
+    .next-copy { flex:1 1 calc(100% - 55px); min-width:0; }
+    .next-step .btn { width:100%; }
+    .progress-card { padding:17px; }
+    .phrase-card { min-height:165px; }
+}

@@ -11,10 +11,10 @@
 .demo-phrase b { color:#735f3b; }
 .revealed-confetti { margin-bottom:19px; color:#bb9653; font-size:17px; letter-spacing:6px; }
 .recipient-avatar { display:grid; place-items:center; width:89px; height:89px; margin:10px 0 13px; border:3px solid #dfc17d; border-radius:50%; color:#355d42; background:#f8f1df; font-size:28px; font-weight:800; box-shadow:0 0 0 8px #4d7b5610; }
-.recipient-name { margin:0 0 8px; color:#294a36; font-size:31px; font-weight:800; letter-spacing:-1px; }
+.recipient-name { max-width:100%; margin:0 0 8px; color:#294a36; font-size:clamp(24px,8vw,31px); font-weight:800; letter-spacing:-1px; overflow-wrap:anywhere; }
 .recipient-copy { margin:0; color:#7c877b; font-size:11px; line-height:1.65; }
 .secret-ribbon { margin-top:17px; padding:8px 13px; border:1px solid #e5eade; border-radius:99px; color:#537254; background:#f3f7ef; font-size:9px; }
 .revealed-phrase { width:100%; margin-top:21px; padding:15px 17px; border:1px solid #efe2ca; border-radius:11px; background:#fff9ed; text-align:left; }
 .revealed-phrase .eyebrow { margin-bottom:6px; font-size:8px; }
-.revealed-phrase p { margin:0; color:#5e5443; font-family:Georgia,serif; font-size:13px; font-style:italic; line-height:1.5; }
+.revealed-phrase p { margin:0; color:#5e5443; font-family:Georgia,serif; font-size:13px; font-style:italic; line-height:1.5; overflow-wrap:anywhere; }
 @media(max-width:520px) { .reveal-wrap { margin-top:3px; } .reveal-card { padding:29px 21px 24px; } .reveal-card .page-heading { font-size:23px; } }

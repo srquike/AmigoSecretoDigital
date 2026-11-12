@@ -56,4 +56,14 @@ textarea.form-input { min-height: 92px; resize: vertical; }
 .guest-main { flex: 1; width: 100%; padding: 25px 18px 35px; }
 .guest-footer { padding: 16px; color: #93998e; font-size: 10px; text-align: center; }
 .guest-footer span { margin: 0 5px; color: #c5bcaa; }
-@media(max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .form-field.full { grid-column: auto; } .card-pad { padding: 18px; } }
+@media(max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-field.full { grid-column: auto; }
+    .card-pad { padding: 18px; }
+    .guest-header { gap: 10px; min-height: 60px; padding: 0 14px; }
+    .guest-brand { gap: 7px; font-size: 15px; }
+    .guest-brand-mark { width: 31px; height: 31px; font-size: 17px; }
+    .guest-tag { gap: 4px; font-size: 7px; letter-spacing: .5px; }
+    .guest-main { padding: 18px 14px 28px; }
+}
+@media(max-width: 360px) { .guest-tag { display: none; } }

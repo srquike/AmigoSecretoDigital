@@ -30,17 +30,20 @@
 @media (max-width: 760px) {
     .sidebar { display: none; }
     .main-area { margin-left: 0; }
-    .topbar { justify-content: space-between; height: 62px; padding: 0 20px; }
+    .topbar { justify-content: space-between; gap: 10px; height: 62px; padding: 0 16px; }
+    .demo-pill { display: none; }
     .mobile-brand { display: flex; align-items: center; gap: 8px; color: #193b31; font-size: 15px; font-weight: 800; }
     .mobile-brand span { font-size: 20px; }
     .mobile-nav { display:grid; grid-template-columns:repeat(3,1fr); padding:7px 13px; border-bottom:1px solid #eee9df; background:#fffdf8; }
     ::deep .mobile-nav a { display:grid; justify-items:center; gap:3px; padding:5px 2px; border-radius:8px; color:#777f75; font-size:9px; font-weight:650; text-decoration:none; }
     ::deep .mobile-nav a.active { color:#24563e; background:#e9f2e9; }
     ::deep .mobile-nav a span { font-size:16px; }
-    .demo-pill { margin: 0 12px 0 auto; padding: 6px 8px; font-size: 8px; }
     .profile-chip { gap: 6px; font-size: 0; }
     .profile-chip .avatar { width: 31px; height: 31px; font-size: 12px; }
     .profile-chip .chevron { display: none; }
-    .page-content { padding: 27px 19px 42px; }
-    .app-footer { gap: 10px; padding: 16px 20px; font-size: 10px; }
+    .logout-button { min-height: 36px; padding: 0 9px; }
+    .page-content { padding: 25px 16px 38px; }
+}
+@media (max-width: 600px) {
+    .app-footer { align-items: center; flex-direction: column; gap: 6px; padding: 15px 16px; font-size: 10px; text-align: center; }
 }
