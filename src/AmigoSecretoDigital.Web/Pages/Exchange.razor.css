@@ -1,10 +1,12 @@
 .page-title-row { display:flex; align-items:flex-start; justify-content:space-between; gap:15px; }
 .page-title-row .page-subtitle { margin-bottom:22px; }
 .exchange-page-actions { display:flex; align-items:center; gap:9px; margin-top:4px; }
-.exchange-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(250px,.9fr); align-items:start; gap:15px; }
-.exchange-main,.exchange-aside { display:grid; gap:15px; }
+.exchange-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(250px,.9fr); align-items:start; gap:15px; min-width:0; }
+.exchange-main,.exchange-aside { display:grid; gap:15px; min-width:0; }
+.exchange-layout > *, .exchange-layout .card { min-width:0; max-width:100%; }
 .event-card { padding:20px 22px; }
-.event-card-heading { display:flex; align-items:center; gap:13px; }
+.event-card-heading { display:flex; align-items:center; gap:13px; min-width:0; }
+.event-card-heading > div:last-child { min-width:0; }
 .event-icon { display:grid; place-items:center; flex:0 0 auto; width:45px; height:45px; border-radius:13px; background:#f1f4e9; font-size:23px; }
 .event-card-heading .eyebrow { margin-bottom:4px; font-size:8px; }
 .event-name { font-size:17px; }
