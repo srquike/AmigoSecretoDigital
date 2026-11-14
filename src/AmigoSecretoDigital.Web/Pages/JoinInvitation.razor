@@ -5,7 +5,7 @@
 <PageTitle>Unirme al intercambio · Amigo Secreto</PageTitle>
 <div class="join-wrap">
     <section class="join-card card">
-        <div class="join-decoration">🎄</div>
+        <div class="join-decoration">🎁</div>
         @if (_joined)
         {
             <div class="join-success-icon">✓</div><div class="eyebrow">¡YA ERES PARTE!</div>
@@ -15,13 +15,13 @@
         }
         else if (_isLoading)
         {
-            <div class="join-icon">💌</div><div class="eyebrow">INVITACIÓN FAMILIAR</div>
+            <div class="join-icon">💌</div><div class="eyebrow">INVITACIÓN A PARTICIPAR</div>
             <h1 class="page-heading">Revisando la invitación…</h1>
             <p class="page-subtitle">Un momento mientras confirmamos que siga disponible.</p>
         }
         else if (_invitation is null)
         {
-            <div class="join-icon">💌</div><div class="eyebrow">INVITACIÓN FAMILIAR</div>
+            <div class="join-icon">💌</div><div class="eyebrow">INVITACIÓN A PARTICIPAR</div>
             <h1 class="page-heading">Este enlace no está disponible</h1>
             <p class="page-subtitle">Puede que las inscripciones estén cerradas o que el enlace haya vencido o sido renovado.</p>
         }
@@ -29,8 +29,8 @@
         {
             <div class="join-icon">💌</div><div class="eyebrow">TE INVITARON A PARTICIPAR</div>
             <h1 class="page-heading">¡Súmate al Amigo Secreto!</h1>
-            <p class="page-subtitle">Completa tus datos para unirte a <strong>@_invitation.ExchangeName</strong>. Toda la familia usa este mismo enlace.</p>
-            <div class="join-event"><span>📅</span><span><b>@_invitation.EventDate.ToString("dd 'de' MMMM", SpanishCulture)</b><small>Intercambio de regalos en familia</small></span></div>
+            <p class="page-subtitle">Completa tus datos para unirte a <strong>@_invitation.ExchangeName</strong>. Todas las personas invitadas usan este mismo enlace.</p>
+            <div class="join-event"><span>📅</span><span><b>@_invitation.EventDate.ToString("dd 'de' MMMM", SpanishCulture)</b><small>Fecha del intercambio</small></span></div>
             @if (_errors.Count > 0) { <div class="alert alert-error" role="alert">@foreach (var error in _errors) { <div>@error</div> }</div> }
             <form @onsubmit="SubmitAsync" @onsubmit:preventDefault>
                 <label class="form-field"><span class="form-label">Tu nombre o apodo</span><input class="form-input" @bind="_displayName" maxlength="60" placeholder="Ej. Ana, Tío Beto..." required /></label>

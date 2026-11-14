@@ -7,9 +7,9 @@
 
 <div class="home-intro">
     <div>
-        <div class="eyebrow">ADMINISTRACIÓN FAMILIAR</div>
+        <div class="eyebrow">ADMINISTRACIÓN DE INTERCAMBIOS</div>
         <h1 class="page-heading">¡Qué gusto verte! <span class="greeting-spark">✦</span></h1>
-        <p class="page-subtitle">La Navidad se disfruta más cuando la preparamos entre todos.</p>
+        <p class="page-subtitle">Organiza un Amigo Secreto y comparte la emoción con tu grupo.</p>
     </div>
     <a class="btn btn-light create-shortcut" href="/admin/create"><span>＋</span> Crear intercambio</a>
 </div>
@@ -25,9 +25,9 @@ else if (_isLoading)
 else if (_nextExchange is null)
 {
     <section class="card card-pad">
-        <div class="eyebrow">TU FAMILIA</div>
+        <div class="eyebrow">TU GRUPO</div>
         <h2 class="card-title">Todavía no hay intercambios</h2>
-        <p class="card-note">Crea uno para compartir la invitación con tu familia.</p>
+        <p class="card-note">Crea uno y comparte la invitación con quienes quieras que participen.</p>
         <a class="btn btn-primary" href="/admin/create">Crear intercambio <span>→</span></a>
     </section>
 }
@@ -46,14 +46,14 @@ else
         ExchangeStatus.RegistrationOpen => minimumParticipantsMessage,
         ExchangeStatus.ReadyForDraw => "Inscripción cerrada; ya puedes sortear",
         ExchangeStatus.Drawn => "El sorteo ya está listo",
-        _ => "Revisa el intercambio familiar"
+        _ => "Revisa el intercambio"
     };
     var nextStepDescription = exchange.Status switch
     {
         ExchangeStatus.RegistrationOpen => "Comparte la invitación. Puedes cerrar cuando haya al menos 3 participantes, aunque no se alcance la cantidad prevista.",
         ExchangeStatus.ReadyForDraw => "La lista está cerrada y cumple el mínimo para realizar el sorteo.",
         ExchangeStatus.Drawn => "Consulta las asignaciones y genera los enlaces privados de revelación.",
-        _ => "Consulta los detalles del intercambio familiar."
+        _ => "Consulta los detalles del intercambio."
     };
     var registrationSummary = exchange.Status switch
     {
@@ -76,7 +76,7 @@ else
         <div class="hero-copy">
             <div class="hero-kicker"><span class="hero-dot"></span> PRÓXIMO INTERCAMBIO</div>
             <h2 id="exchange-title">@exchange.Name</h2>
-            <p>Los mejores regalos vienen de compartir un ratito con los nuestros.</p>
+            <p>Los mejores regalos vienen de compartir un buen momento.</p>
             <div class="hero-meta">
                 <span><span class="meta-icon">▣</span> @exchange.EventDate.ToString("dd 'de' MMMM", SpanishCulture)</span>
                 <span><span class="meta-icon">$</span> @(exchange.Budget is null ? "Sin presupuesto máximo" : $"Tope de ${exchange.Budget:0.##}")</span>
@@ -92,7 +92,7 @@ else
     </section>
 
     <section class="stats-row" aria-label="Resumen del intercambio">
-        <article class="stat-card card"><div class="stat-icon icon-people">♧</div><div><div class="stat-label">Familia confirmada</div><div class="stat-value">@_nextExchange.ParticipantCount <small>de @exchange.ExpectedParticipants previstos</small></div></div><div class="stat-foot">@registrationSummary</div></article>
+        <article class="stat-card card"><div class="stat-icon icon-people">♧</div><div><div class="stat-label">Participantes confirmados</div><div class="stat-value">@_nextExchange.ParticipantCount <small>de @exchange.ExpectedParticipants previstos</small></div></div><div class="stat-foot">@registrationSummary</div></article>
         <article class="stat-card card"><div class="stat-icon icon-calendar">▣</div><div><div class="stat-label">Nos vemos en</div><div class="stat-value">@DaysUntil(exchange.EventDate) <small>días</small></div></div><div class="stat-foot">@exchange.EventDate.ToString("dd 'de' MMMM", SpanishCulture)</div></article>
         <article class="stat-card card"><div class="stat-icon icon-gift">♧</div><div><div class="stat-label">Presupuesto acordado</div><div class="stat-value">@(exchange.Budget is null ? "—" : $"${exchange.Budget:0.##}") <small>máximo</small></div></div><div class="stat-foot">Un regalo sencillo, con cariño</div></article>
     </section>
@@ -102,9 +102,9 @@ else
             <div class="section-heading"><div><h2 class="card-title">Así va la organización</h2><p class="card-note">La cantidad prevista es una meta; el sorteo se habilita desde 3 personas.</p></div><span class="status @StatusClass(exchange.Status)">@StatusLabel(exchange.Status)</span></div>
             <div class="progress-count"><strong>@_nextExchange.ParticipantCount</strong><span>de @exchange.ExpectedParticipants personas</span><b>@progress%</b></div>
             <div class="progress-track"><div class="progress-fill" style="width: @progress%"></div></div>
-            <div class="progress-footer"><span>🎄 @progressCaption</span><a href="@($"/admin/exchange/{exchange.Id}")">Ver detalles <span>→</span></a></div>
+            <div class="progress-footer"><span>🎁 @progressCaption</span><a href="@($"/admin/exchange/{exchange.Id}")">Ver detalles <span>→</span></a></div>
         </section>
-        <aside class="phrase-card"><div class="phrase-label"><span>✦</span> CONSEJITO SECRETO</div><div class="phrase-quote">“@GiftPhraseCatalog.All[4]”</div><div class="phrase-byline">— Sabiduría de la familia</div><div class="phrase-decoration" aria-hidden="true">❋</div></aside>
+        <aside class="phrase-card"><div class="phrase-label"><span>✦</span> CONSEJITO SECRETO</div><div class="phrase-quote">“@GiftPhraseCatalog.All[4]”</div><div class="phrase-byline">— Un consejo para compartir</div><div class="phrase-decoration" aria-hidden="true">❋</div></aside>
     </div>
 
     <section class="next-step card"><div class="next-icon">💌</div><div class="next-copy"><h2 class="card-title">@nextStepTitle</h2><p class="card-note">@nextStepDescription</p></div><a class="btn btn-primary" href="@($"/admin/exchange/{exchange.Id}")">Administrar intercambio <span>→</span></a></section>

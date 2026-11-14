@@ -12,14 +12,14 @@
 }
 else if (_exchange is null)
 {
-    <section class="card card-pad"><h1 class="page-heading">No encontramos ese intercambio</h1><p class="page-subtitle">Vuelve al listado para elegir otro intercambio familiar.</p><a class="btn btn-primary" href="/admin/exchanges">Ver intercambios <span>→</span></a></section>
+    <section class="card card-pad"><h1 class="page-heading">No encontramos ese intercambio</h1><p class="page-subtitle">Vuelve al listado para elegir otro intercambio.</p><a class="btn btn-primary" href="/admin/exchanges">Ver intercambios <span>→</span></a></section>
 }
 else
 {
     var hasMinimumParticipants = _participants.Count >= ExchangeRules.MinimumParticipants;
-    <div class="eyebrow">ADMINISTRACIÓN FAMILIAR</div>
+    <div class="eyebrow">ADMINISTRACIÓN DE INTERCAMBIOS</div>
     <div class="page-title-row">
-        <div><h1 class="page-heading">@_exchange.Name</h1><p class="page-subtitle">Invita a los tuyos y prepara el sorteo de diciembre.</p></div>
+        <div><h1 class="page-heading">@_exchange.Name</h1><p class="page-subtitle">Invita a tu grupo y prepara el sorteo.</p></div>
         <div class="exchange-page-actions">
             <span class="status @StatusClass(_exchange.Status)">@StatusLabel(_exchange.Status)</span>
             <ConfirmDeleteExchange ExchangeName="@_exchange.Name" IsBusy="@_isDeletingExchange" OnConfirm="DeleteExchangeAsync" />
@@ -31,9 +31,9 @@ else
     <div class="exchange-layout">
         <div class="exchange-main">
             <section class="card card-pad event-card">
-                <div class="event-card-heading"><div class="event-icon">🎄</div><div><div class="eyebrow">@_exchange.EventDate.ToString("dd 'DE' MMMM", SpanishCulture) · @_exchange.EventDate.Year</div><h2 class="card-title event-name">@_exchange.Name</h2></div></div>
+                <div class="event-card-heading"><div class="event-icon">🎁</div><div><div class="eyebrow">@_exchange.EventDate.ToString("dd 'DE' MMMM", SpanishCulture) · @_exchange.EventDate.Year</div><h2 class="card-title event-name">@_exchange.Name</h2></div></div>
                 <p class="event-description">@_exchange.Conditions</p>
-                <div class="event-details"><span><b>Presupuesto máximo</b><strong>@(_exchange.Budget is null ? "Sin límite" : $"${_exchange.Budget:0.##} por regalo")</strong></span><span><b>Familia prevista</b><strong>@_exchange.ExpectedParticipants personas</strong></span><span><b>Participantes</b><strong>@_participants.Count registrados</strong></span></div>
+                <div class="event-details"><span><b>Participantes previstos</b><strong>@_exchange.ExpectedParticipants personas</strong></span><span><b>Presupuesto máximo</b><strong>@(_exchange.Budget is null ? "Sin límite" : $"${_exchange.Budget:0.##} por regalo")</strong></span><span><b>Participantes</b><strong>@_participants.Count registrados</strong></span></div>
             </section>
 
             @if (_exchange.Status == ExchangeStatus.Drawn)
@@ -88,7 +88,7 @@ else
 
         <aside class="exchange-aside">
             <section class="card card-pad invite-card">
-                <div class="small-icon">💌</div><h2 class="card-title">Un enlace para todos</h2><p class="card-note">Comparte este mismo enlace con cada familiar. Cada quien se registra con su nombre y crea su propia frase privada.</p>
+                <div class="small-icon">💌</div><h2 class="card-title">Un enlace para todos</h2><p class="card-note">Comparte este enlace con tu grupo. Cada persona se registra con su nombre y crea su propia frase privada.</p>
                 @if (_invitation is not null)
                 {
                     <div class="shared-link"><code>@InviteUrl</code><button class="copy-button" @onclick="() => CopyLinkAsync(InviteUrl)">Copiar enlace</button></div>
@@ -183,7 +183,7 @@ else
         await RunBusyAsync(async () =>
         {
             _invitation = await Exchanges.CreateInvitationAsync(_exchangeGuid);
-            _message = "Enlace listo para compartir con toda la familia.";
+            _message = "Enlace listo para compartir con tu grupo.";
         });
     }
 

@@ -4,9 +4,9 @@
 @inject ILogger<ExchangeList> Logger
 
 <PageTitle>Intercambios · Amigo Secreto</PageTitle>
-<div class="eyebrow">ADMINISTRACIÓN FAMILIAR</div>
+<div class="eyebrow">ADMINISTRACIÓN DE INTERCAMBIOS</div>
 <div class="list-title-row">
-    <div><h1 class="page-heading">Intercambios</h1><p class="page-subtitle">Consulta y administra los intercambios de tu familia.</p></div>
+    <div><h1 class="page-heading">Intercambios</h1><p class="page-subtitle">Consulta y administra tus intercambios de Amigo Secreto.</p></div>
     <a class="btn btn-primary" href="/admin/create"><span>＋</span> Crear intercambio</a>
 </div>
 
@@ -24,7 +24,7 @@ else if (_exchanges.Count == 0)
 }
 else
 {
-    <div class="list-summary"><span class="list-summary-icon">🎄</span><div><b>@_exchanges.Count intercambios familiares</b><small>Próximas celebraciones y recuerdos de años anteriores.</small></div></div>
+    <div class="list-summary"><span class="list-summary-icon">🎁</span><div><b>@_exchanges.Count intercambios</b><small>Próximos sorteos y encuentros anteriores.</small></div></div>
 
     <section class="exchange-list-grid" aria-label="Lista de intercambios">
         @foreach (var item in _exchanges)

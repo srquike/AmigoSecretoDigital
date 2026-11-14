@@ -6,15 +6,15 @@
 <PageTitle>Acceso de organizador · Amigo Secreto</PageTitle>
 <div class="join-wrap">
     <section class="join-card card auth-card">
-        <div class="join-decoration">🎄</div>
+        <div class="join-decoration">🎁</div>
         <div class="join-icon">🔐</div>
         <div class="eyebrow">ACCESO DE ORGANIZADOR</div>
         <h1 class="page-heading">Qué bueno verte</h1>
-        <p class="page-subtitle">Inicia sesión para administrar los intercambios de tu familia.</p>
+        <p class="page-subtitle">Inicia sesión para organizar y administrar tus intercambios.</p>
 
         @if (!IsSupabaseConfigured)
         {
-            <div class="alert alert-warning" role="status">Configura Supabase para habilitar el acceso de organizador.</div>
+            <div class="alert alert-warning" role="status">El acceso de organizador no está disponible en este momento. Intenta más tarde.</div>
         }
         else
         {
@@ -28,7 +28,7 @@
                 <label class="form-field"><span class="form-label">Contraseña</span><input class="form-input" type="password" name="password" autocomplete="current-password" maxlength="256" required /></label>
                 <button class="btn btn-primary join-submit" type="submit">Iniciar sesión <span>→</span></button>
             </form>
-            <p class="auth-footnote">Las cuentas de organizador se administran desde Supabase.</p>
+            <p class="auth-footnote">Para obtener acceso de organizador, comunícate con quien administra los intercambios.</p>
         }
     </section>
 </div>

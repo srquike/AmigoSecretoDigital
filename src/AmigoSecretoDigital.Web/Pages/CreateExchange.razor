@@ -10,13 +10,13 @@
     <section class="create-form-area">
         <div class="eyebrow">NUEVO INTERCAMBIO</div>
         <h1 class="page-heading">Preparemos la sorpresa</h1>
-        <p class="page-subtitle">Completa los detalles y luego invita a tu familia.</p>
+        <p class="page-subtitle">Completa los detalles y luego invita a las personas que participarán.</p>
         <section class="card card-pad create-form-card">
             <h2 class="card-title">Los detalles</h2>
             <p class="card-note create-card-note">Puedes ajustar las condiciones antes de realizar el sorteo.</p>
             <form @onsubmit="Submit" @onsubmit:preventDefault>
                 <div class="form-grid">
-                    <label class="form-field full"><span class="form-label">Nombre del intercambio</span><input class="form-input" @bind="_name" maxlength="80" placeholder="Ej. Navidad en familia" required /></label>
+                    <label class="form-field full"><span class="form-label">Nombre del intercambio</span><input class="form-input" @bind="_name" maxlength="80" placeholder="Ej. Amigo Secreto de la oficina" required /></label>
                     <label class="form-field"><span class="form-label">Fecha del intercambio</span><input class="form-input" type="date" @bind="_eventDate" required /></label>
                     <label class="form-field"><span class="form-label">Personas previstas</span><input class="form-input" type="number" @bind="_expectedParticipants" min="3" max="100" required /><small class="form-hint">Es una meta estimada; puedes cerrar la inscripción desde 3 participantes.</small></label>
                     <label class="form-field"><span class="form-label">Presupuesto máximo <small>(opcional)</small></span><div class="budget-input"><span>$</span><input class="form-input" type="number" min="0" step="1" @bind="_budget" placeholder="25" /></div><small class="form-hint">En dólares estadounidenses.</small></label>
@@ -29,9 +29,9 @@
     </section>
     <aside class="create-aside">
         <div class="create-illustration"><div class="illustration-star">✦</div><div class="illustration-box">🎁</div><div class="illustration-leaf">✧</div></div>
-        <h2>Una tradición<br />que nos reúne</h2>
-        <p>Después de crear el intercambio, compartirás un único enlace con toda la familia.</p>
-        <div class="aside-steps"><span><b>1</b> Define la fecha y las reglas</span><span><b>2</b> Invita a tus familiares</span><span><b>3</b> Sortea cuando todos estén</span></div>
+        <h2>Una sorpresa<br />para compartir</h2>
+        <p>Después de crear el intercambio, compartirás un único enlace con todas las personas participantes.</p>
+        <div class="aside-steps"><span><b>1</b> Define la fecha y las reglas</span><span><b>2</b> Invita a tu grupo</span><span><b>3</b> Sortea cuando estén listos</span></div>
     </aside>
 </div>
 
