@@ -61,6 +61,13 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        if (HasPrerenderedLookup && PrerenderedExchangeCode == ExchangeCode)
+        {
+            _invitation = PrerenderedInvitation;
+            _isLoading = false;
+            return;
+        }
+
         _isLoading = true;
         _joined = false;
         _errors.Clear();
@@ -68,7 +75,14 @@
             ? null
             : await Exchanges.GetInvitationContextAsync(ExchangeCode);
         _isLoading = false;
+        PrerenderedExchangeCode = ExchangeCode;
+        PrerenderedInvitation = _invitation;
+        HasPrerenderedLookup = true;
     }
+
+    [PersistentState] public bool HasPrerenderedLookup { get; set; }
+    [PersistentState] public string? PrerenderedExchangeCode { get; set; }
+    [PersistentState] public InvitationContext? PrerenderedInvitation { get; set; }
 
     private async Task SubmitAsync()
     {

@@ -55,10 +55,31 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        try { _exchanges = await Exchanges.GetExchangesAsync(); }
+        if (HasPrerenderedData)
+        {
+            _exchanges = PrerenderedExchanges ?? [];
+            _error = PrerenderedError;
+            _isLoading = false;
+            return;
+        }
+
+        try
+        {
+            _exchanges = await Exchanges.GetExchangesAsync();
+            PrerenderedExchanges = _exchanges.ToList();
+        }
         catch { _error = "No pudimos cargar los intercambios. Intenta recargar la página."; }
-        finally { _isLoading = false; }
+        finally
+        {
+            PrerenderedError = _error;
+            HasPrerenderedData = true;
+            _isLoading = false;
+        }
     }
+
+    [PersistentState] public bool HasPrerenderedData { get; set; }
+    [PersistentState] public List<ExchangeSummary>? PrerenderedExchanges { get; set; }
+    [PersistentState] public string? PrerenderedError { get; set; }
 
     private async Task DeleteExchangeAsync(Guid exchangeId)
     {
@@ -71,6 +92,7 @@ else
         {
             await Exchanges.DeleteAsync(exchangeId);
             _exchanges = await Exchanges.GetExchangesAsync();
+            PrerenderedExchanges = _exchanges.ToList();
         }
         catch (Exception exception)
         {

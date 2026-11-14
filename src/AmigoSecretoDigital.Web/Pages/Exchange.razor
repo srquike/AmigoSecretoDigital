@@ -143,6 +143,16 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        if (HasPrerenderedData && PrerenderedExchangeId == ExchangeId)
+        {
+            _exchange = PrerenderedExchange;
+            _participants = PrerenderedParticipants ?? [];
+            _assignments = PrerenderedAssignments ?? [];
+            _invitation = PrerenderedInvitation;
+            _isLoading = false;
+            return;
+        }
+
         _isLoading = true;
         _message = string.Empty;
         _exchange = null;
@@ -153,6 +163,8 @@ else
 
         if (!Guid.TryParse(ExchangeId, out _exchangeGuid))
         {
+            PrerenderedExchangeId = ExchangeId;
+            HasPrerenderedData = true;
             _isLoading = false;
             return;
         }
@@ -176,7 +188,21 @@ else
             _message = "No pudimos cargar este intercambio. Intenta recargar la página.";
         }
         finally { _isLoading = false; }
+
+        PrerenderedExchangeId = ExchangeId;
+        PrerenderedExchange = _exchange;
+        PrerenderedParticipants = _participants.ToList();
+        PrerenderedAssignments = _assignments.ToList();
+        PrerenderedInvitation = _invitation;
+        HasPrerenderedData = true;
     }
+
+    [PersistentState] public bool HasPrerenderedData { get; set; }
+    [PersistentState] public string? PrerenderedExchangeId { get; set; }
+    [PersistentState] public AmigoSecretoDigital.Domain.Exchange? PrerenderedExchange { get; set; }
+    [PersistentState] public List<AdminParticipant>? PrerenderedParticipants { get; set; }
+    [PersistentState] public List<AdminAssignment>? PrerenderedAssignments { get; set; }
+    [PersistentState] public Invitation? PrerenderedInvitation { get; set; }
 
     private async Task GenerateInvitationAsync()
     {

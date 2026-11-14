@@ -118,14 +118,19 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        if (HasPrerenderedData)
+        {
+            SetNextExchange(PrerenderedExchanges ?? []);
+            _error = PrerenderedError;
+            _isLoading = false;
+            return;
+        }
+
         try
         {
             var exchanges = await Exchanges.GetExchangesAsync();
-            _nextExchange = exchanges
-                .Where(item => item.Exchange.Status != ExchangeStatus.Cancelled)
-                .OrderBy(item => item.Exchange.EventDate < DateOnly.FromDateTime(DateTime.Today))
-                .ThenBy(item => item.Exchange.EventDate)
-                .FirstOrDefault();
+            PrerenderedExchanges = exchanges.ToList();
+            SetNextExchange(PrerenderedExchanges);
         }
         catch
         {
@@ -133,9 +138,22 @@ else
         }
         finally
         {
+            PrerenderedError = _error;
+            HasPrerenderedData = true;
             _isLoading = false;
         }
     }
+
+    [PersistentState] public bool HasPrerenderedData { get; set; }
+    [PersistentState] public List<ExchangeSummary>? PrerenderedExchanges { get; set; }
+    [PersistentState] public string? PrerenderedError { get; set; }
+
+    private void SetNextExchange(IEnumerable<ExchangeSummary> exchanges) =>
+        _nextExchange = exchanges
+            .Where(item => item.Exchange.Status != ExchangeStatus.Cancelled)
+            .OrderBy(item => item.Exchange.EventDate < DateOnly.FromDateTime(DateTime.Today))
+            .ThenBy(item => item.Exchange.EventDate)
+            .FirstOrDefault();
 
     private static int DaysUntil(DateOnly date) => Math.Max(0, date.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber);
 
